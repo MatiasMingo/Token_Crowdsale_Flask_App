@@ -1,4 +1,5 @@
 {% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}
 Mitsein
@@ -32,23 +33,16 @@ Mitsein
 {% endblock %}
 
 {% block content %}
-<form>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Email address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-  </div>
-  <div class="form-group form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-
+<div class="container">
+	<form class="form-signin" method="POST" action="/login">
+		<h2>Please sign in</h2>
+	    {{ form.hidden_tag() }}
+	    {{ wtf.form_field(form.email) }}
+	    {{ wtf.form_field(form.password) }}
+	    {{ wtf.form_field(form.remember) }}
+	  <button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+</div>
 {% endblock %}
 
 {% block scripts %}
