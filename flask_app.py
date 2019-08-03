@@ -94,11 +94,9 @@ def buy_stock(address_buyer):
     amount_eth = float(request.form.get('number', 0))
     amount_wei = amount_eth*10**18
     token_amount = contract.functions.getTokenAmount(amount_wei)
-    contract.functions._preValidatePurchase(address_buyer, amount_wei)
-    contract.functions._deliverTokens(address_buyer, token_amount)
-    data = {'': square}
-    data = jsonify(data)
-    return data
+    if token_amount <= contract.functions.remainingTokens():
+        contract.functions.buyTokens(address_buyer, {value : amount_wei , sender : address_buyer});
+
 
 @app.route('/logout')
 @login_required
