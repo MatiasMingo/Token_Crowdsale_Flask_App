@@ -1,0 +1,15 @@
+#navbar_titulo {
+	font-size: 8em;
+}
+
+.li { display: inline;
+	color: green; 
+}
+
+.jumbotron {
+	background-color: blue;
+}
+
+#eg{
+	background-color: blue;
+}
