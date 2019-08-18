@@ -11,8 +11,8 @@ Mitsein
 {% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Mitsein</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light main">
+  <a class="navbar-brand" href="">Mitsein</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -44,43 +44,27 @@ Mitsein
 {% endblock %}
 
 {% block content %}
-<div class="jumbotron jumbotron-fluid">
-  <div class="container">
-    <h1 class="display-4">Mitsein</h1>
-    <p class="lead">Transnational governmental entity backed by a descentralized stable currency.
-    Next gen standard of living.</p>
-  <h1>Finance our destiny and obligation.</h1>
-  <form method="post" id="form">
-    <label for="num">Amount of money: </label>
-    <input type="text" id="num" name="number" autofocus autocomplete="off">
-    <label for="address">Address: </label>
-    <input type="text" id="address" name="address" autofocus autocomplete="off">
-    <button>Buy</button>
-  </form>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script>
-      $('#form').on('submit', function(e){
-        var number = $('#num').val();
-        var address = $('#address').val();
-        e.preventDefault();
-        $.ajax({
-          url: 'http://127.0.0.1:5000/buy-stock/',
-          data: {'number': number, 'address': address },
-          method: 'POST',
-          success: function(data) {
-            $('#num').val('');
-            $('#buy-stock')
-          }
-        });
-      });
-    </script>
-  </div>
-  <div id="list-example" class="list-group">
-    <a class="list-group-item list-group-item-action" href="#list-item-1">Goal</a>
-    <a class="list-group-item list-group-item-action" href="#list-item-2">Elements</a>
-    <a class="list-group-item list-group-item-action" href="#list-item-3">Founder</a>
-  </div>
+<div class="sidenav">
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#clients">Clients</a>
+  <a href="#contact">Contact</a>
 </div>
+<div class="jumbotron jumbotron-fluid main aqua-gradient">
+  <div class="container">
+    <h1>New generation government</h1>
+    <div class="grid-container">
+      <div class="grid-item"><a>Vision</a></div>
+      <div class="grid-item"><a>Involvement</a></div>
+      <div class="grid-item"><a>Innerworkings</a></div>
+      <div class="grid-item"><a>Team</a></div>
+      <div class="grid-item"><a>Services</a></div>
+      <div class="grid-item"><a>Government</a></div>
+      <div class="grid-item"><a>Economic system</a></div>
+      <div class="grid-item"><a>Healthcare</a></div>
+      <div class="grid-item"><a>Fight against global warming</a></div>
+    </div>
+  </div>
 <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
   <h4 id="list-item-1">Goal</h4>
   <p>Our main goal is to provide the world with the dramatic socio-economical shift that is needed to solve problems such as climate change, over exploitation of resources, general individualisic societal mentality, poverty, lack of access to a proper education, lack of access to quality and rewarding jobs and inflation. on top of this, to ensure mass adoption and participation we will dedicate our efforts to establish communication and organization between people and open the sea of opportunities they have to express their dreams and ideas. We are giving power to the people 

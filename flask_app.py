@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, Response, jsonify
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField
 from wtforms.validators import InputRequired, Email, Length
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -20,6 +20,9 @@ login_manager.login_view = 'login'
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    sirname = db.Column(db.String(50))
+    age = db.Column(db.Integer)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(80))
 
@@ -33,6 +36,9 @@ class LoginForm(FlaskForm):
     remember = BooleanField('remember me')
 
 class RegisterForm(FlaskForm):
+    name = StringField('name', validators=[InputRequired(), Length(max=50)])
+    sirname = StringField('sirname', validators=[InputRequired(), Length(max=50)])
+    age = IntegerField('age', validators=[InputRequired()])
     email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
 
@@ -43,7 +49,6 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
@@ -60,7 +65,7 @@ def signup():
     form = RegisterForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
-        new_user = User(email=form.email.data, password=hashed_password)
+        new_user = User(email=form.email.data, password=hashed_password, name=form.name, sirname=form.sirname)
         db.session.add(new_user)
         db.session.commit()
         #return '<h1>' + form.email.data + ' ' + form.password.data +'</h1>'
@@ -74,14 +79,17 @@ def dashboard():
     return render_template('dashboard.html', name=current_user.email)
 
 @app.route('/payments')
+@login_required
 def payments():
     return render_template('payments.html', name=current_user.email)
 
 @app.route('/stock_exchange')
+@login_required
 def stock_exchange():
     return render_template('stock_exchange.html', name=current_user.email)
 
 @app.route('/economical_organization')
+@login_required
 def economical_organization():
     return render_template('economical_organization.html', name=current_user.email)
 """
@@ -119,4 +127,4 @@ def logout():
 
 
 if __name__ == "__main__":
-	app.run(debug=True, threaded=True)              
+    app.run(debug=True, threaded=True)              

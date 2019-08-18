@@ -7,11 +7,12 @@ Mitsein
 {% block styles %}
 {{super()}}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
 {% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Mitsein</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light main">
+  <a class="navbar-brand" href="">Mitsein</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -43,8 +44,26 @@ Mitsein
 {% endblock %}
 
 {% block content %}
-<div class="container">
 
+<div class="sidenav">
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#clients">Clients</a>
+  <a href="#contact">Contact</a>
+</div>
+<div class="container main">
+  <h1>New generation government</h1>
+  <div class="grid-container">
+    <div class="grid-item"><a>Vision</a></div>
+    <div class="grid-item"><a>Involvement</a></div>
+    <div class="grid-item"><a>Innerworkings</a></div>
+    <div class="grid-item"><a>Team</a></div>
+    <div class="grid-item"><a>Services</a></div>
+    <div class="grid-item"><a>Government</a></div>
+    <div class="grid-item"><a>Economic system</a></div>
+    <div class="grid-item"><a>Healthcare</a></div>
+    <div class="grid-item"><a>Fight against global warming</a></div>
+  </div>
   <h1>Finance our destiny and obligation.</h1>
   <form method="post" id="form">
     <label for="num">Amount of money: </label>
@@ -53,6 +72,7 @@ Mitsein
     <input type="text" id="address" name="address" autofocus autocomplete="off">
     <button>Buy</button>
   </form>
+</div>
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
       $('#form').on('submit', function(e){
