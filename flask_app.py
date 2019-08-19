@@ -54,7 +54,7 @@ def login():
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('ecoexchange'))
         
         return '<h2>Invalid email or password</h2>'
 
@@ -65,33 +65,20 @@ def signup():
     form = RegisterForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
-        new_user = User(email=form.email.data, password=hashed_password, name=form.name, sirname=form.sirname)
+        new_user = User(email=form.email.data, password=hashed_password, name=form.name.data, sirname=form.sirname.data, age=form.age.data)
         db.session.add(new_user)
         db.session.commit()
+        return redirect(url_for('login'))
         #return '<h1>' + form.email.data + ' ' + form.password.data +'</h1>'
 
     return render_template('signup.html', form=form)
 
 """Dashboard only accesible if logged in"""
-@app.route('/dashboard')
+@app.route('/ecoexchange')
 @login_required
-def dashboard():
-    return render_template('dashboard.html', name=current_user.email)
+def ecoexchange():
+    return render_template('ecoexchange.html', name=current_user.email)
 
-@app.route('/payments')
-@login_required
-def payments():
-    return render_template('payments.html', name=current_user.email)
-
-@app.route('/stock_exchange')
-@login_required
-def stock_exchange():
-    return render_template('stock_exchange.html', name=current_user.email)
-
-@app.route('/economical_organization')
-@login_required
-def economical_organization():
-    return render_template('economical_organization.html', name=current_user.email)
 """
 @app.route('/chart-data')
 def chart_data():
@@ -127,4 +114,5 @@ def logout():
 
 
 if __name__ == "__main__":
+    db.create_all()
     app.run(debug=True, threaded=True)              
