@@ -12,14 +12,14 @@
   left: 0;
   background-color: transparent;
   overflow-x: hidden;
-  padding-top: 80px;
+  padding-top: 16em;
 }
 
 .sidenav a {
   padding: 6px 8px 6px 16px;
   text-decoration: none;
   font-size: 25px;
-  color: #818181;
+  color: #150F58;
   display: block;
 }
 
@@ -28,7 +28,7 @@
 }
 
 .main {
-  margin-left: 160px; /* Same as the width of the sidenav */
+  margin-left: 260px; /* Same as the width of the sidenav */
   font-size: 28px; /* Increased text to enable scrolling */
   padding: 0px 10px;
 }
@@ -38,9 +38,8 @@
   color: white;
 }
 
-.navbar-brand a:hover {
+.navbar-brand:hover {
   color: white;
-  text-decoration: none;
 }
 
 .navbar {
@@ -56,6 +55,10 @@
 
 .nav-link{
   color: white;
+}
+
+.nav-link:hover {
+  color: #150F58 ;
 }
 
 #navbar-content{

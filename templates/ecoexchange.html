@@ -8,22 +8,15 @@ Mitsein
 {{super()}}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ecoexchange.css') }}">
 {% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light main">
-  <a class="navbar-brand" href="/">Mitsein</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
-  </div>
-</nav>
+<div id="main_page">
+  <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">Mitsein</a>
+    <a id="ecoexchange-logo">Ecoexchange</a>
+  </nav>
 {% endblock %}
 
 {% block content %}
@@ -37,29 +30,27 @@ Mitsein
 <div class="container main">
   <br>
   <br>
-  <h1 align="center">Help finance our obligation as humanity.</h1>
   <br>
-  <h1> Projects </h1>
-  <div class="grid-container">
-      <div class="grid-item"><a>Vision</a></div>
-        <div class="grid-item"><a>Involvement</a></div>
-        <div class="grid-item"><a>Innerworkings</a></div>
-        <div class="grid-item"><a>Team</a></div>
-        <div class="grid-item"><a>Services</a></div>
-        <div class="grid-item"><a>Government</a></div>
-        <div class="grid-item"><a>Economic system</a></div>
-        <div class="grid-item"><a>Healthcare</a></div>
-      <div class="grid-item"><a>Fight against global warming</a></div>
-  </div>
-  <form method="post" id="form">
-    <label for="num">Amount of money: </label>
-    <input type="text" id="num" name="number" autofocus autocomplete="off">
-    <label for="address">Address: </label>
-    <input type="text" id="address" name="address" autofocus autocomplete="off">
-    <button>Buy</button>
-  </form>
-</div>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <br>
+  <br>
+  <h1 id="slogan_ecoexchange" align="center">Help finance our obligation as humanity</h1>
+  <br>
+  <br>
+  <br>
+  <br>
+  <h1 id="titulo-token-for-sale">Tokens for sale</h1>
+  <br>
+  <div>
+    <h1 class="buy-token-title"> Buy Mitsein tokens:</h1>
+    <br>
+    <form method="post" id="form">
+      <label for="num">Amount of ethereum: </label>
+      <input type="text" id="num" name="number" autofocus autocomplete="off">
+      <label for="address">Your wallet address: </label>
+      <input type="text" id="address" name="address" autofocus autocomplete="off">
+      <button>Buy</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
       $('#form').on('submit', function(e){
         var number = $('#num').val();
@@ -77,6 +68,11 @@ Mitsein
       });
     </script>
   </div>
+  <br>
+  <br>
+</div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
