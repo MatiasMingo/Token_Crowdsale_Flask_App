@@ -1,3 +1,6 @@
+import json
+import random
+import time
 from flask import Flask, request, render_template, redirect, url_for, Response, jsonify
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -7,9 +10,10 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import token_interaction
-import json, datetime
+from datetime import datetime
 
 app = Flask(__name__)
+random.seed()
 app.config['SECRET_KEY'] = 'Secretkeyyy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 Bootstrap(app)
@@ -79,17 +83,16 @@ def signup():
 def ecoexchange():
     return render_template('ecoexchange.html', name=current_user.email)
 
-"""
+
 @app.route('/chart-data')
 def chart_data():
-    def obtain_data_token():
+    def generate_random_data():
         while True:
-            data_json = json.dumps(
-                {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'value': })  
+            json_data = json.dumps(
+                {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'value': random.random() * 100})
             yield f"data:{json_data}\n\n"
             time.sleep(1)
-    return Response(obtain_data_token(), mimetype=)
-"""
+    return Response(generate_random_data(), mimetype='text/event-stream')
 
 @app.route('/buy-stock', methods=['POST'])
 def buy_stock(abi, address):
