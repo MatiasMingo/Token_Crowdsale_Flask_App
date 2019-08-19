@@ -8,6 +8,7 @@ Mitsein
 {{super()}}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 {% endblock %}
 
 {% block navbar %}
@@ -31,55 +32,64 @@ Mitsein
           </a>
         </li>
       </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
     </div>
   </nav>
 {% endblock %}
 
 {% block content %}
 <div class="jumbotron jumbotron-fluid">
+  <br>
+  <br>
+  <h1 align="center" id="slogan_mitsein">Next generation government</h1>
+  <br>
+  <br>
+  <br>
+  <h2 id="concept_mitsein">
+    "Our main objective is to create a state-of-the-art governmental institution for the management and development of society and the economy whilst embracing new technologies and automation." Matías Mingo (Founder)
+  </h2>
+  <br>
+  <br>
+  <br>
   <div class="container">
-    <h1>Next generation government</h1>
     <div class="grid-container">
-      <div class="grid-item"><a>Vision</a></div>
-      <div class="grid-item"><a>Involvement</a></div>
-      <div class="grid-item"><a>Innerworkings</a></div>
-      <div class="grid-item"><a>Team</a></div>
-      <div class="grid-item"><a>Services</a></div>
-      <div class="grid-item"><a>Government</a></div>
-      <div class="grid-item"><a>Economic system</a></div>
-      <div class="grid-item"><a>Healthcare</a></div>
-      <div class="grid-item"><a>Fight against global warming</a></div>
+      <div class="grid-item" id="grid-item1"><a>Vision</a></div>
+      <div class="grid-item" id="grid-item2"><a>Stablecoin</a></div>
+      <div class="grid-item" id="grid-item3"><a>Fight against global warming</a></div>
+      <div class="grid-item" id="grid-item4"><a>Team</a></div>
+      <div class="grid-item" id="grid-item5"><a>Services</a></div>
+      <div class="grid-item" id="grid-item6"><a>Founder</a></div>
+      <div class="grid-item" id="grid-item7"><a>Projects</a></div>
+      <div class="grid-item" id="grid-item8"><a>Sponsors</a></div>
+      <div class="grid-item" id="grid-item9"><a>Ethics</a></div>
     </div>
   </div>
-<div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
-  <h4 id="list-item-1">Goal</h4>
-  <p>Our main goal is to provide the world with the dramatic socio-economical shift that is needed to solve problems such as climate change, over exploitation of resources, general individualisic societal mentality, poverty, lack of access to a proper education, lack of access to quality and rewarding jobs and inflation. on top of this, to ensure mass adoption and participation we will dedicate our efforts to establish communication and organization between people and open the sea of opportunities they have to express their dreams and ideas. We are giving power to the people 
-  </p>
-  <h4 id="list-item-2">Elements</h4>
-  <ul class="list-group">
-  <li class="list-group-item list-group-item-success">Stable decentralized currency</li>
-  <li class="list-group-item list-group-item-danger">Innovation</li>
-  <li class="list-group-item list-group-item-info">Gaian Economics: Sustainable development</li>
-  <li class="list-group-item list-group-item-warning">Government owned by its participants</li>
-  <li class="list-group-item list-group-item-light">Philosophical message</li>
-  <li class="list-group-item list-group-item-success">State owned companies</li>
-  <li class="list-group-item list-group-item-danger">Ethical alignment</li>
-  <li class="list-group-item list-group-item-info">Redefinition of labbour and acces to work</li>
-  <li class="list-group-item list-group-item-warning">Redefinition of education and access to education</li>
-  <li class="list-group-item list-group-item-light">Economical organization and communication</li>
-  <li class="list-group-item list-group-item-success">Access to financing and mentoring</li>
-  <li class="list-group-item list-group-item-danger">100% transparent</li>
-  <li class="list-group-item list-group-item-info">Community makes the desitions</li>
-  <li class="list-group-item list-group-item-warning">Adoption of automation always in societies best interest</li>
-  <li class="list-group-item list-group-item-light">Central organizer and orchestrator (at the beginning at least)</li>
-</ul>
-  <h4 id="list-item-3">Founder</h4>
-  <p>...</p>
-</div>
+  <div>
+    <h1>Vision</h1>
+  </div>
+  <div>
+    <h1>Stablecoin</h1>
+  </div>
+  <div>
+    <h1>Fight against global warming</h1>
+  </div>
+  <div>
+    <h1>Team</h1>
+  </div>
+  <div>
+    <h1>Services</h1>
+  </div>
+  <div>
+    <h1>Founder</h1>
+  </div>
+  <div>
+    <h1>Projects</h1>
+  </div>
+  <div>
+    <h1>Sponsors</h1>
+  </div>
+  <div>
+    <h1>Ethics</h1>
+  </div>
 </div>
 {% endblock %}
 
