@@ -18,4 +18,4 @@ contract.functions.buyTokens(address_buyer).transact({ 'from': address_buyer, 'g
 print(contract.functions.weiRaised().transact({"from": secondary_address}))
 print("weiRaised transactor account balance: {}".format((web3.eth.getBalance(secondary_address)/1000000000000000000)))
 print("Contract owner: {}".format((web3.eth.getBalance(address)/1000000000000000000)))
-print("Metask account: {}".format((web3.eth.getBalance(address_buyer)/1000000000000000000)))
+print("Metamask account: {}".format((web3.eth.getBalance(address_buyer)/1000000000000000000)))

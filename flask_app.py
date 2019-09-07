@@ -1,6 +1,7 @@
 import json
 import random
 import time
+import sys
 from flask import Flask, request, render_template, redirect, url_for, Response, jsonify
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -12,14 +13,9 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from datetime import datetime
 from web3 import Web3
 
-# Set up web3 connection with Ganache
-ganache_url = "http://127.0.0.1:7545"
+ganache_url = "http://127.0.0.1:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
-abi = json.loads('[{"constant": false, "inputs": [{"name": "account", "type": "address"} ], "name": "addWhitelisted", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": false, "inputs": [{"name": "account", "type": "address"} ], "name": "removeWhitelisted", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": true, "inputs": [], "name": "rate", "outputs": [{"name": "", "type": "uint256"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [{"name": "account", "type": "address"} ], "name": "isWhitelisted", "outputs": [{"name": "", "type": "bool"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [], "name": "weiRaised", "outputs": [{"name": "", "type": "uint256"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": false, "inputs": [], "name": "renounceWhitelistAdmin", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": true, "inputs": [], "name": "wallet", "outputs": [{"name": "", "type": "address"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": false, "inputs": [{"name": "account", "type": "address"} ], "name": "addWhitelistAdmin", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": true, "inputs": [{"name": "account", "type": "address"} ], "name": "isWhitelistAdmin", "outputs": [{"name": "", "type": "bool"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [], "name": "remainingTokens", "outputs": [{"name": "", "type": "uint256"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [], "name": "tokenWallet", "outputs": [{"name": "", "type": "address"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": false, "inputs": [], "name": "renounceWhitelisted", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": false, "inputs": [{"name": "beneficiary", "type": "address"} ], "name": "buyTokens", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function"}, {"constant": true, "inputs": [], "name": "token", "outputs": [{"name": "", "type": "address"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"inputs": [{"name": "_rate", "type": "uint256"}, {"name": "_wallet", "type": "address"}, {"name": "_token", "type": "address"}, {"name": "_tokenWallet", "type": "address"} ], "payable": false, "stateMutability": "nonpayable", "type": "constructor"}, {"payable": true, "stateMutability": "payable", "type": "fallback"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "purchaser", "type": "address"}, {"indexed": true, "name": "beneficiary", "type": "address"}, {"indexed": false, "name": "value", "type": "uint256"}, {"indexed": false, "name": "amount", "type": "uint256"} ], "name": "TokensPurchased", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistedAdded", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistedRemoved", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistAdminAdded", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistAdminRemoved", "type": "event"} ]') 
-address = "0x3391DE4E2E3bd3Fad3963151959E3ffb76DBf1E6"
-contract = web3.eth.contract(
-address=address,
-abi=abi)
+
 
 app = Flask(__name__)
 random.seed()
@@ -30,6 +26,8 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+with open('tokens.json', "r") as json_file:
+    tokens = json.load(json_file)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -93,29 +91,32 @@ def ecoexchange():
     return render_template('ecoexchange.html', name=current_user.email)
 
 
-@app.route('/chart-data')
+@app.route('/chart-data-mitsein')
 def chart_data():
-    abi = json.loads('[{"constant": false, "inputs": [{"name": "account", "type": "address"} ], "name": "addWhitelisted", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": false, "inputs": [{"name": "account", "type": "address"} ], "name": "removeWhitelisted", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": true, "inputs": [], "name": "rate", "outputs": [{"name": "", "type": "uint256"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [{"name": "account", "type": "address"} ], "name": "isWhitelisted", "outputs": [{"name": "", "type": "bool"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [], "name": "weiRaised", "outputs": [{"name": "", "type": "uint256"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": false, "inputs": [], "name": "renounceWhitelistAdmin", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": true, "inputs": [], "name": "wallet", "outputs": [{"name": "", "type": "address"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": false, "inputs": [{"name": "account", "type": "address"} ], "name": "addWhitelistAdmin", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": true, "inputs": [{"name": "account", "type": "address"} ], "name": "isWhitelistAdmin", "outputs": [{"name": "", "type": "bool"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [], "name": "remainingTokens", "outputs": [{"name": "", "type": "uint256"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": true, "inputs": [], "name": "tokenWallet", "outputs": [{"name": "", "type": "address"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"constant": false, "inputs": [], "name": "renounceWhitelisted", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function"}, {"constant": false, "inputs": [{"name": "beneficiary", "type": "address"} ], "name": "buyTokens", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function"}, {"constant": true, "inputs": [], "name": "token", "outputs": [{"name": "", "type": "address"} ], "payable": false, "stateMutability": "view", "type": "function"}, {"inputs": [{"name": "_rate", "type": "uint256"}, {"name": "_wallet", "type": "address"}, {"name": "_token", "type": "address"}, {"name": "_tokenWallet", "type": "address"} ], "payable": false, "stateMutability": "nonpayable", "type": "constructor"}, {"payable": true, "stateMutability": "payable", "type": "fallback"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "purchaser", "type": "address"}, {"indexed": true, "name": "beneficiary", "type": "address"}, {"indexed": false, "name": "value", "type": "uint256"}, {"indexed": false, "name": "amount", "type": "uint256"} ], "name": "TokensPurchased", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistedAdded", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistedRemoved", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistAdminAdded", "type": "event"}, {"anonymous": false, "inputs": [{"indexed": true, "name": "account", "type": "address"} ], "name": "WhitelistAdminRemoved", "type": "event"} ]') 
-    address = "0x3391DE4E2E3bd3Fad3963151959E3ffb76DBf1E6"
+    token_details_dict = tokens["Mitsein"]
+    address = token_details_dict["address"]
+    abi = token_details_dict["abi"]
     contract = web3.eth.contract(
     address=address,
     abi=abi)
-    def generate_random_data():
+    print(contract.all_functions(), file=sys.stderr)
+    token_eth_balance = (web3.eth.getBalance("0x7FA91473869716D2560F90Fc37CB07EF7532d605"))/1000000000000000000
+    def generate_data():
         while True:
             json_data = json.dumps(
-                {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'value': string(contract.functions.rate().call())})
+                {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'value': token_eth_balance})
             yield f"data:{json_data}\n\n"
             time.sleep(1)
-    return Response(generate_random_data(), mimetype='text/event-stream')
+    return Response(generate_data(), mimetype='text/event-stream')
 
-@app.route('/buy-stock', methods=['POST'])
-def buy_stock(abi, address):
+
+@app.route('/buy-stock-mitsein', methods=['POST'])
+def buy_stock():
+    token_details_dict = tokens["Mitsein"]
     amount_eth = float(request.form.get('number', 0))
     amount_wei = amount_eth*10**18
     address_buyer = request.form.get('address', 0)
-    token_amount = contract.functions.getTokenAmount(amount_wei)
-    if token_amount <= contract.functions.remainingTokens():
-        contract.functions.buyTokens(address_buyer, {value : amount_wei , sender : address_buyer})
+    contract.functions.buyTokens(address_buyer).transact({ 'from': address_buyer, 'gas': 4712388, 'value': amount_wei})
 
 
 @app.route('/logout')
