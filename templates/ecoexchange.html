@@ -42,7 +42,7 @@ Mitsein
   <h1 id="titulo-token-for-sale">Tokens for sale</h1>
   <br>
   <div>
-    <h1 class="buy-token-title"> Buy Mitsein tokens:</h1>
+    <h1 class="buy-token-title"> Mitsein</h1>
     <br>
     <div class="container">
       <div class="row">
@@ -68,7 +68,7 @@ Mitsein
                 data: {
                     labels: [],
                     datasets: [{
-                        label: "Random Dataset",
+                        label: "Mitsein Token Price",
                         backgroundColor: 'rgb(255, 99, 132)',
                         borderColor: 'rgb(255, 99, 132)',
                         data: [],
@@ -79,7 +79,7 @@ Mitsein
                     responsive: true,
                     title: {
                         display: true,
-                        text: 'Creating Real-Time Charts with Flask'
+                        text: 'Real Time Chart'
                     },
                     tooltips: {
                         mode: 'index',
@@ -116,7 +116,7 @@ Mitsein
 
             source.onmessage = function (event) {
                 const data = JSON.parse(event.data);
-                if (config.data.labels.length === 20) {
+                if (config.data.labels.length === 1000) {
                     config.data.labels.shift();
                     config.data.datasets[0].data.shift();
                 }
