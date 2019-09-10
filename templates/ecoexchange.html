@@ -127,30 +127,19 @@ Mitsein
         });
     </script>
     <br>
-    <form method="post" id="form">
+    <form action="/buy-stock-mitsein" method="post" id="form">
       <label for="num">Amount of ethereum: </label>
       <input type="text" id="num" name="number" autofocus autocomplete="off">
       <label for="address">Your wallet address: </label>
       <input type="text" id="address" name="address" autofocus autocomplete="off">
-      <button>Buy</button>
+      <button type="submit" value="Buy" />
     </form>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script>
-      $('#form').on('submit', function(e){
-        var number = $('#num').val();
-        var address = $('#address').val();
-        e.preventDefault();
-        $.ajax({
-          url: 'http://127.0.0.1:5000/buy-stock-mitsein/',
-          data: {'number': number, 'address': address },
-          method: 'POST',
-          success: function(data) {
-            $('#num').val('');
-            $('#buy-stock-mitsein')
-          }
-        });
-      });
-    </script>
+  </div>
+  <br>
+  <br>
+</div>
+</div>>
+
   </div>
   <br>
   <br>

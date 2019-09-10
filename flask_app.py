@@ -99,8 +99,7 @@ def chart_data():
     contract = web3.eth.contract(
     address=address,
     abi=abi)
-    print(contract.all_functions(), file=sys.stderr)
-    token_eth_balance = (web3.eth.getBalance("0x7FA91473869716D2560F90Fc37CB07EF7532d605"))/1000000000000000000
+    token_eth_balance = (web3.eth.getBalance("0xf8d2b6F55652AF43B63ddF5De355019ECdD041B2"))/1000000000000000000
     def generate_data():
         while True:
             json_data = json.dumps(
@@ -113,10 +112,18 @@ def chart_data():
 @app.route('/buy-stock-mitsein', methods=['POST'])
 def buy_stock():
     token_details_dict = tokens["Mitsein"]
-    amount_eth = float(request.form.get('number', 0))
+    print(token_details_dict, file=sys.stderr)
+    address = token_details_dict["address"]
+    abi = token_details_dict["abi"]
+    contract = web3.eth.contract(
+    address=address,
+    abi=abi)
+    amount_eth = int(request.form.get('number', 0))
     amount_wei = amount_eth*10**18
     address_buyer = request.form.get('address', 0)
+    print(address_buyer, file=sys.stderr)
     contract.functions.buyTokens(address_buyer).transact({ 'from': address_buyer, 'gas': 4712388, 'value': amount_wei})
+    return redirect(url_for('ecoexchange'))
 
 
 @app.route('/logout')
