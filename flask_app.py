@@ -99,8 +99,14 @@ def chart_data():
     contract = web3.eth.contract(
     address=address,
     abi=abi)
-    """Aqui obtener ecuación para la curva de oferta y demanda"""
-    token_eth_balance = (web3.eth.getBalance("0xf8d2b6F55652AF43B63ddF5De355019ECdD041B2"))/1000000000000000000
+    """Aqui obtener ecuación para la curva de oferta y demanda
+    M x C = T x H
+    M: Total number of coins
+    C: Price of the token C = 1/P where P is the price level
+    T: Total economic value of transactions
+    H: Average holding time H = 1/V
+    C = kQ/M  = HQ/M"""
+    token_eth_balance = (web3.eth.getBalance(address))/1000000000000000000
     def generate_data():
         while True:
             json_data = json.dumps(
