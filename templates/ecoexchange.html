@@ -127,13 +127,32 @@ Mitsein
         });
     </script>
     <br>
-    <form action="/buy-stock-mitsein" method="post" id="form">
-      <label for="num">Amount of ethereum: </label>
-      <input type="text" id="num" name="number" autofocus autocomplete="off">
-      <label for="address">Your wallet address: </label>
-      <input type="text" id="address" name="address" autofocus autocomplete="off">
-      <button type="submit" value="Buy" />
-    </form>
+    <div>
+      <h1>BUY</h1>
+      <form action="/buy-stock-mitsein" method="post" id="form">
+        <label for="num">Amount of ethereum: </label>
+        <input type="text" id="num" name="amount_eth" autofocus autocomplete="off">
+        <label for="num">Price limit: </label>
+        <input type="text" id="num" name="price" autofocus autocomplete="off">
+        <label for="address">Your wallet address: </label>
+        <input type="text" id="address" name="address" autofocus autocomplete="off">
+        <button type="submit" value="Buy" />
+      </form>
+    </div>
+    <div>
+      <h1>SELL</h1>
+      <form action="/sell-stock-mitsein" method="post" id="form">
+        <label for="num">Amount of ethereum: </label>
+        <input type="text" id="num" name="amount_eth" autofocus autocomplete="off">
+        <label for="num">Price limit: </label>
+        <input type="text" id="num" name="price" autofocus autocomplete="off">
+        <label for="address">Your wallet address: </label>
+        <input type="text" id="address" name="address" autofocus autocomplete="off">
+        <button type="submit" value="Buy" />
+      </form>
+    </div>
+    <h1>{{token_price}}</h1>
+    <h1>{{orders_dict}}</h1>
   </div>
   <br>
   <br>
