@@ -3,7 +3,7 @@
 {% block title %}
 Mitsein
 {% endblock %}
-
+ 
 {% block styles %}
 {{super()}}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
@@ -16,7 +16,40 @@ Mitsein
 <div id="main_page">
   <nav class="navbar navbar-expand-lg">
     <a class="navbar-brand" href="/">Mitsein</a>
-    <a id="ecoexchange-logo">Ecoexchange</a>
+    <img src="static/images/hand_holding_1.jpeg" style="width:65px;height:65px;margin-top: 20px;margin-left: -20px;" />
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto" id="navbar-content">
+        <li class="nav-item">
+          <a class="nav-link " href="/ecoexchange" role="button">
+            Financial Sector
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Societal Organization
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Involvement
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            For Developers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a id="create_account_button" class="nav-link " href="/signup" role="button">
+            Join
+          </a>
+        </li>
+      </ul>
+    </div>
   </nav>
 {% endblock %}
 
@@ -29,15 +62,6 @@ Mitsein
   <a href="#contact">Contact</a>
 </div>
 <div class="container main">
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
-  <h1 id="slogan_ecoexchange" align="center">Help finance our obligation as humanity</h1>
-  <br>
-  <br>
-  <br>
   <br>
   <h1 id="titulo-token-for-sale">Tokens for sale</h1>
   <br>
@@ -101,7 +125,7 @@ Mitsein
                             display: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Value'
+                                labelString: 'Value (ETH)'
                             }
                         }]
                     }
@@ -129,26 +153,28 @@ Mitsein
     <br>
     <div>
       <h1>BUY</h1>
-      <form action="/buy-stock-mitsein" method="post" id="form">
+      <form class="form-inline" action="/buy-stock-mitsein" method="post" id="form">
         <label for="num">Amount of ethereum: </label>
         <input type="text" id="num" name="amount_eth" autofocus autocomplete="off">
         <label for="num">Price limit: </label>
         <input type="text" id="num" name="price" autofocus autocomplete="off">
         <label for="address">Your wallet address: </label>
         <input type="text" id="address" name="address" autofocus autocomplete="off">
-        <button type="submit" value="Buy" />
+        <button class="order_button" type="submit" value="Buy" >Buy</button>
       </form>
     </div>
+    <br>
+    <br>
     <div>
       <h1>SELL</h1>
-      <form action="/sell-stock-mitsein" method="post" id="form">
+      <form class="form-inline" action="/sell-stock-mitsein" method="post">
         <label for="num">Amount of ethereum: </label>
         <input type="text" id="num" name="amount_eth" autofocus autocomplete="off">
         <label for="num">Price limit: </label>
         <input type="text" id="num" name="price" autofocus autocomplete="off">
         <label for="address">Your wallet address: </label>
         <input type="text" id="address" name="address" autofocus autocomplete="off">
-        <button type="submit" value="Buy" />
+        <button class="order_button" type="submit" value="Sell">Sell</button>
       </form>
     </div>
     <h1>{{token_price}}</h1>
@@ -164,7 +190,6 @@ Mitsein
   <br>
 </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}

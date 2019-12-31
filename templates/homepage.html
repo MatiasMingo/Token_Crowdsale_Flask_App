@@ -15,6 +15,7 @@ Mitsein
 <div id="main_page">
   <nav class="navbar navbar-expand-lg">
     <a class="navbar-brand" href="/">Mitsein</a>
+    <img src="static/images/hand_holding_1.jpeg" style="width:65px;height:65px;margin-top: 20px;margin-left: -20px;" />
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -23,12 +24,27 @@ Mitsein
       <ul class="navbar-nav mr-auto" id="navbar-content">
         <li class="nav-item">
           <a class="nav-link " href="/ecoexchange" role="button">
-            EcoExchange
+            Financial Sector
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="/signup" role="button">
-            Create account
+          <a class="nav-link " href="/" role="button">
+            Societal Organization
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Involvement
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            For Developers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a id="create_account_button" class="nav-link " href="/signup" role="button">
+            Join
           </a>
         </li>
       </ul>
@@ -37,58 +53,22 @@ Mitsein
 {% endblock %}
 
 {% block content %}
-<div class="jumbotron jumbotron-fluid">
-  <br>
-  <br>
-  <h1 align="center" id="slogan_mitsein">Next generation government</h1>
-  <br>
-  <br>
-  <br>
-  <h2 id="concept_mitsein">
-    "Our main objective is to create a state-of-the-art governmental institution for the management and development of society and the economy whilst embracing new technologies and automation." Matías Mingo (Founder)
-  </h2>
-  <br>
-  <br>
-  <br>
-  <div class="container">
-    <div class="grid-container">
-      <div class="grid-item" id="grid-item1"><a>Vision</a></div>
-      <div class="grid-item" id="grid-item2"><a>Stablecoin</a></div>
-      <div class="grid-item" id="grid-item3"><a>Fight against global warming</a></div>
-      <div class="grid-item" id="grid-item4"><a>Team</a></div>
-      <div class="grid-item" id="grid-item5"><a>Services</a></div>
-      <div class="grid-item" id="grid-item6"><a>Founder</a></div>
-      <div class="grid-item" id="grid-item7"><a>Projects</a></div>
-      <div class="grid-item" id="grid-item8"><a>Sponsors</a></div>
-      <div class="grid-item" id="grid-item9"><a>Ethics</a></div>
-    </div>
-  </div>
-  <div>
-    <h1>Vision</h1>
-  </div>
-  <div>
-    <h1>Stablecoin</h1>
-  </div>
-  <div>
-    <h1>Fight against global warming</h1>
-  </div>
-  <div>
-    <h1>Team</h1>
-  </div>
-  <div>
-    <h1>Services</h1>
-  </div>
-  <div>
-    <h1>Founder</h1>
-  </div>
-  <div>
-    <h1>Projects</h1>
-  </div>
-  <div>
-    <h1>Sponsors</h1>
-  </div>
-  <div>
-    <h1>Ethics</h1>
+  <div class="jumbotron jumbotron-fluid page">
+    <br>
+    <br>
+    <h1 align="center" id="slogan_mitsein">Next generation government</h1>
+    <br>
+    <br>
+    <br>
+    <h2 id="concept_mitsein">
+      FOR US BY US
+    </h2>
+    <a id="create_account_button"  href="/signup" role="button">
+      Join
+    </a>
+    <br>
+    <br>
+    <br>
   </div>
 </div>
 {% endblock %}

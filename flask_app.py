@@ -1,5 +1,6 @@
 import json
 import random
+import os
 import time
 import sys
 import threading
@@ -13,6 +14,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime
 from web3 import Web3
+from get_token_details import get_token_details, write_token_price
+from get_orders_dict import get_orders_dict, write_orders_dict
  
 ganache_url = "http://127.0.0.1:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
@@ -20,7 +23,7 @@ web3 = Web3(Web3.HTTPProvider(ganache_url))
 
 app = Flask(__name__)
 random.seed()
-app.config['SECRET_KEY'] = 'Secretkeyyy'
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 Bootstrap(app)
 db = SQLAlchemy(app)
@@ -28,12 +31,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+current_price = get_token_details("Mitsein")[2]
 
-orders_dict = {}
-current_price = 0
-
-with open('tokens.json', "r") as json_file:
-    tokens = json.load(json_file)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +42,22 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(80))
 
+class Orders_history_mitsein(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    buyer_id = db.Column(db.String(50))
+    seller_id = db.Column(db.String(50))
+    amount = db.Column(db.Integer)
+    price = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime)
 
+class Price_history_mitsein(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    price = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime)
+
+"""Method that checks at any given time the price a token and executes
+the orders at this price. It also updates the orders dict and current_price
+global variables."""
 @app.before_first_request
 def activate_job():
     def order_excecutioner():
@@ -52,26 +66,34 @@ def activate_job():
       lead_transactions_list = None
       lead_undone_orders_dict = None
       while True:
-        current_dict = orders_dict
-        if current_dict == {}:
+        current_orders_dict = get_orders_dict("Mitsein")
+        if current_orders_dict == {}:
             continue
         else:
-            for order_price in current_dict.keys():
-              num_transactions, transactions_list , undone_orders_dict= check_num_transactions(order_price, current_dict[order_price])
+            for order_price in current_orders_dict.keys():
+              num_transactions, transactions_list, undone_orders_dict= check_num_transactions(order_price, current_orders_dict[order_price])
+              print("Nº de trasacciones para {}:{}{}".format(order_price, num_transactions, lead_price))
               if lead_amount < num_transactions:
-                print(num_transactions, file=sys.stderr)
+                print("si")
                 lead_amount = num_transactions
                 lead_price = order_price
                 lead_transactions_list = transactions_list
                 lead_undone_orders_dict = undone_orders_dict
-            current_price = lead_price
-            orders_dict[current_price] = lead_undone_orders_dict
-            if lead_transactions_list != None:
-                excecute_transactions(current_price, lead_transactions_list)
+            if lead_transactions_list != None :
+                print("Nueva valoración token: \n price:{} \n transactions list: {} \n undone orders dict:{})".format(lead_price, lead_transactions_list, lead_undone_orders_dict))
+                current_orders_dict[str(lead_price)] = lead_undone_orders_dict
+                write_orders_dict("Mitsein", current_orders_dict)
+                write_token_price("Mitsein",lead_price)
+                print("NUEVO DICCIONARIO DE ORDENES:{}".format(get_orders_dict("Mitsein")))
+                excecute_transactions(lead_price, lead_transactions_list) 
+                lead_amount = 0
+                lead_transactions_list = None
+                lead_undone_orders_dict = None
+                continue
     thread = threading.Thread(target=order_excecutioner)
     thread.start()
 
-
+ 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -101,7 +123,6 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
                 return redirect(url_for('ecoexchange'))
-        
         return '<h2>Invalid email or password</h2>'
 
     return render_template('login.html', form=form)
@@ -123,17 +144,12 @@ def signup():
 @app.route('/ecoexchange')
 @login_required
 def ecoexchange():
+    orders_dict = get_orders_dict("Mitsein")
     return render_template('ecoexchange.html', name=current_user.email, orders_dict=orders_dict, token_price=current_price)
 
 
 @app.route('/chart-data-mitsein')
 def chart_data():
-    token_details_dict = tokens["Mitsein"]
-    address = token_details_dict["address"]
-    abi = token_details_dict["abi"]
-    contract = web3.eth.contract(
-    address=address,
-    abi=abi)
     """Aqui obtener ecuación para la curva de oferta y demanda
     M x C = T x H
     M: Total number of coins
@@ -142,6 +158,11 @@ def chart_data():
     H: Average holding time H = 1/V
     C = kQ/M  = HQ/M"""
     def generate_data():
+        address, abi, current_price = get_token_details("Mitsein")
+        prices = Price_history_mitsein.query.all()
+        for price in prices:
+            json_data = json.dumps({'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'value': current_price})
+            yield f"data:{json_data}\n\n"
         while True:
             json_data = json.dumps(
                 {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'value': current_price})
@@ -152,29 +173,34 @@ def chart_data():
 
 @app.route('/buy-stock-mitsein', methods=['POST'])
 def buy_stock():
-    token_details_dict = tokens["Mitsein"]
-    address = token_details_dict["address"]
-    abi = token_details_dict["abi"]
-    contract = web3.eth.contract(
-    address=address,
-    abi=abi)
+    current_price = get_token_details("Mitsein")[2]
     amount_eth = int(request.form.get('amount_eth', 0))
     amount_wei = amount_eth*10**18
     price_limit = int(request.form.get('price', 0))
     address_buyer = request.form.get('address', 0)
+    orders_dict = get_orders_dict("Mitsein")
     if web3.eth.getBalance(address_buyer) >= amount_wei:
         if price_limit != current_price:
             amount_token = amount_eth/price_limit
-            if price_limit not in orders_dict.keys():
-                orders_dict[price_limit] = {"buy":[{'address':address_buyer , 'amount': amount_token}], "sell":[]}
+            if str(price_limit) not in orders_dict.keys():
+                orders_dict[str(price_limit)] = {"buy":[{'address':address_buyer , 'amount': amount_token}], "sell":[]}
             else:
-                orders_dict[price_limit]["buy"].append({'address':address_buyer , 'amount': amount_token})
+                if orders_dict[str(price_limit)] != None:
+                    orders_dict[str(price_limit)]["buy"].append({'address':address_buyer , 'amount': amount_token})
+                else:
+                    orders_dict[str(price_limit)] = {"buy":[{'address':address_buyer , 'amount': amount_token}], "sell":[]}
         else:
             amount_token = amount_eth/current_price
-            if current_price not in orders_dict.keys():
-                orders_dict[current_price] = {"buy":[{'address':address_buyer , 'amount': amount_token}], "sell":[]}
+            if str(current_price) not in orders_dict.keys():
+                orders_dict[str(current_price)] = {"buy":[{'address':address_buyer , 'amount': amount_token}], "sell":[]}
             else:
-                orders_dict[current_price]["buy"].append({'address':address_buyer , 'amount': amount_token})
+                if orders_dict[str(current_price)] != None:
+                    orders_dict[str(current_price)]["buy"].append({'address':address_buyer , 'amount': amount_token})
+                else:
+                    orders_dict[str(current_price)] = {"buy":[{'address':address_buyer , 'amount': amount_token}], "sell":[]}
+        write_orders_dict("Mitsein", orders_dict)
+        orders_dict = get_orders_dict("Mitsein")
+        print("Orden de Compra realizada. Nuevo diccionario de ordenes:{}".format(orders_dict))
     else:
         pass
     return redirect(url_for('ecoexchange'))
@@ -182,35 +208,34 @@ def buy_stock():
 
 @app.route('/sell-stock-mitsein', methods=['POST'])
 def sell_stock():
-    token_details_dict = tokens["Mitsein"]
-    address = token_details_dict["address"]
-    abi = token_details_dict["abi"]
-    contract = web3.eth.contract(
-    address=address,
-    abi=abi)
+    current_price = get_token_details("Mitsein")[2]
     amount_eth = int(request.form.get('amount_eth', 0))
     amount_wei = amount_eth*10**18
     price_limit = int(request.form.get('price', 0))
     address_seller = request.form.get('address', 0)
+    orders_dict = get_orders_dict("Mitsein")
     if web3.eth.getBalance(address_seller) >= amount_wei:
         if price_limit != current_price:
             amount_token = amount_eth/price_limit
-            if price_limit not in orders_dict.keys():
-                orders_dict[price_limit] = {"sell":[{'address':address_seller , 'amount': amount_token}], "buy":[]}
+            if str(price_limit) not in orders_dict.keys():
+                orders_dict[str(price_limit)] = {"sell":[{'address':address_seller , 'amount': amount_token}], "buy":[]}
             else:
-                if "sell" in orders_dict[price_limit].keys():
-                    orders_dict[price_limit]["sell"].append({'address':address_seller , 'amount': amount_token})
+                if "sell" in orders_dict[str(price_limit)].keys():
+                    orders_dict[str(price_limit)]["sell"].append({'address':address_seller , 'amount': amount_token})
                 else:
-                    orders_dict[price_limit]["sell"]=[{'address':address_seller , 'amount': amount_token}]
+                    orders_dict[str(price_limit)]["sell"]=[{'address':address_seller , 'amount': amount_token}]
         else:
             amount_token = amount_eth/current_price
-            if current_price not in orders_dict.keys():
-                orders_dict[current_price] = {"sell":[{'address':address_seller , 'amount': amount_token}], "buy":[]}
+            if str(current_price) not in orders_dict.keys():
+                orders_dict[str(current_price)] = {"sell":[{'address':address_seller , 'amount': amount_token}], "buy":[]}
             else:
-                if "sell" in orders_dict[current_price].keys():
-                    orders_dict[current_price]["sell"].append({'address':address_seller , 'amount': amount_token})
+                if "sell" in orders_dict[str(current_price)].keys():
+                    orders_dict[str(current_price)]["sell"].append({'address':address_seller , 'amount': amount_token})
                 else:
-                    orders_dict[current_price]["sell"]=[{'address':address_seller , 'amount': amount_token}]
+                    orders_dict[str(current_price)]["sell"]=[{'address':address_seller , 'amount': amount_token}]
+        write_orders_dict("Mitsein", orders_dict)
+        orders_dict = get_orders_dict("Mitsein")
+        print("Orden de Venta realizada. Nuevo diccionario de ordenes:{}".format(orders_dict))
     else:
         pass
     return redirect(url_for('ecoexchange'))
@@ -222,6 +247,7 @@ def logout():
     return redirect(url_for('index'))
 
 def start_backgrounds():
+    """Method that starts """
     app.logger.info('testing info log')
     def start_loop():
         not_started = True
@@ -242,7 +268,9 @@ def start_backgrounds():
 
 
 def check_num_transactions(price, current_orders):
-  """Receives orders_dict = {"buy":[{"address", "amount"}], "sell":[{"address", "amount"}]} """
+  """Method that receives current_orders = {"buy":[{"address", "amount"}], "sell":[{"address", "amount"}]} 
+  and the price to return the number of transactions possible, the list of transactions and the list of
+  transactions not done"""
   if current_orders != None:
       if "sell" in current_orders.keys():
         sell_orders = current_orders["sell"]
@@ -273,39 +301,40 @@ def check_num_transactions(price, current_orders):
       order_not_done = {"type":None, "address":None, "amount": None}
       while len(sell_orders) > 0 and len(buy_orders) > 0:
         if current_seller != None and current_buyer != None:
-            if current_seller["amount"] > current_buyer["amount"] :
-              amount_diference = current_seller["amount"] - current_buyer["amount"]
-              transactions_done.append({"address_buyer": current_buyer["address"], "address_seller": current_seller["address"], "amount": current_buyer["amount"]})
-              current_seller["amount"] = amount_diference
-              num_transactions += current_buyer["amount"]
-              order_not_done = {"type":"Sell", "address": current_seller["address"], "amount": amount_diference}
-              if len(buy_orders) > 0:
-                  buy_orders.pop(0)
-              if len(buy_orders) > 0:
-                  current_buyer = buyers_list[0]
-            elif  current_seller["amount"] == current_buyer["amount"] :
-              transactions_done.append({"address_buyer": current_buyer["amount"], "address_seller": current_seller["amount"], "amount": current_seller["amount"]})
-              num_transactions += current_seller["amount"]
-              order_not_done = current_seller
-              order_not_done = {"type":None, "address": None, "amount": None}
-              if len(buy_orders) > 0:
-                  buy_orders.pop(0)
-              if len(sell_orders) > 0:
-                  sell_orders.pop(0)
-              if len(buy_orders) > 0:
-                  current_buyer = buy_orders[0]
-              if len(sell_orders) > 0:
-                  current_seller = sell_orders[0]
-            else:
-              amount_diference = current_buyer["amount"] - current_seller["amount"]
-              transactions_done.append({"address_buyer": current_buyer["address"], "address_seller": current_seller["address"], "amount": current_seller["amount"]})
-              current_buyer["amount"] = amount_diference
-              num_transactions += current_seller["amount"]
-              order_not_done = {"type":"Buy", "address": current_buyer["address"], "amount": amount_diference}
-              if len(sell_orders) > 0:
-                  sell_orders.pop(0)
-              if len(sell_orders) > 0:
-                  current_seller = sell_orders[0]
+          if current_seller["amount"] > current_buyer["amount"] :
+            amount_diference = current_seller["amount"] - current_buyer["amount"]
+            transactions_done.append({"address_buyer": current_buyer["address"], "address_seller": current_seller["address"], "amount": current_buyer["amount"]})
+            current_seller["amount"] = amount_diference
+            """He aquí una linea muy importtante: La siguiente linea implica que el precio es determinado mediante el descubrimiento del """
+            num_transactions += current_buyer["amount"]
+            order_not_done = {"type":"Sell", "address": current_seller["address"], "amount": amount_diference}
+            if len(buy_orders) > 0:
+                buy_orders.pop(0)
+            if len(buy_orders) > 0:
+                current_buyer = buyers_list[0]
+          elif current_seller["amount"] == current_buyer["amount"] :
+            transactions_done.append({"address_buyer": current_buyer["address"], "address_seller": current_seller["address"], "amount": current_seller["amount"]})
+            num_transactions += current_seller["amount"]
+            order_not_done = current_seller
+            order_not_done = {"type":None, "address": None, "amount": None}
+            if len(buy_orders) > 0:
+                buy_orders.pop(0)
+            if len(sell_orders) > 0:
+                sell_orders.pop(0)
+            if len(buy_orders) > 0:
+                current_buyer = buy_orders[0]
+            if len(sell_orders) > 0:
+                current_seller = sell_orders[0]
+          else:
+            amount_diference = current_buyer["amount"] - current_seller["amount"]
+            transactions_done.append({"address_buyer": current_buyer["address"], "address_seller": current_seller["address"], "amount": current_seller["amount"]})
+            current_buyer["amount"] = amount_diference
+            num_transactions += current_seller["amount"]
+            order_not_done = {"type":"Buy", "address": current_buyer["address"], "amount": amount_diference}
+            if len(sell_orders) > 0:
+                sell_orders.pop(0)
+            if len(sell_orders) > 0:
+                current_seller = sell_orders[0]
       undone_orders_dict = {"buy":[], "sell":[]}
       if order_not_done["type"] != None:
         if order_not_done["type"] == "Buy":
@@ -314,30 +343,41 @@ def check_num_transactions(price, current_orders):
           sell_orders.insert(0,{"address": order_not_done["address"], "amount": order_not_done["amount"]})
         undone_orders_dict["buy"] = buy_orders
         undone_orders_dict["sell"] = sell_orders
+      else:
+        undone_orders_dict = {}
       return num_transactions, transactions_done, undone_orders_dict
   else:
       return 0, [], {}
 
 
 
-def excecute_transactions(price, transactions_list):
-  """Recieves transactions_list = [{"address_buyer": , "address_seller": , "amount": }, ...]"""
+def excecute_transactions(price_limit, transactions_list):
+  """Method that recieves transactions_list = [{"address_buyer": , "address_seller": , "amount": }, ...] and the price
+  and excecutes the buyTokens function from the respective token contract for each transaction in the transactions_list."""
+  address, abi, price = get_token_details("Mitsein")
+  contract = web3.eth.contract(
+  address=address,
+  abi=abi)
   for transaction_dict in transactions_list:
-    token_details_dict = tokens["Mitsein"]
-    address_token = token_details_dict["address"]
-    abi = token_details_dict["abi"]
-    contract = web3.eth.contract(
-    address=address_token,
-    abi=abi)
     address_buyer = transaction_dict["address_buyer"]
     address_seller = transaction_dict["address_seller"]
     amount = transaction_dict["amount"]
-    amount_wei = amount*current_price*10**18
-    contract.functions.buyTokens(address_buyer).transact({ 'from': address_buyer, 'gas': 4712388, 'value': amount_wei})
-    web3.eth.sendTransaction({"from": address_token, "to": address_seller, "value": amount_wei })
+    amount_wei = int(amount*int(price_limit)*10**18)
+    try:
+        contract.functions.buyTokens(address_buyer).transact({ 'from': address_buyer, 'gas': 4712388, 'value': amount_wei})
+    except:
+        print("Theres been a problem with the transaction")
+        continue
+    new_order = Orders_history_mitsein(buyer_id=address_buyer, seller_id=address_seller, amount=amount, price=price_limit, timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    db.session.add(new_order)
+    db.session.commit()
+  new_price = Price_history_mitsein(price=price_limit, timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+  db.session.add(new_price) 
+  db.session.commit()
 
 
-    
+
+  
 
 
 if __name__ == "__main__":

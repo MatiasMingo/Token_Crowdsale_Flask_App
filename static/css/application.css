@@ -3,6 +3,8 @@
   color: #150F58 ; 
 }
 
+
+
 .sidenav {
   height: 100%;
   width: 160px;
@@ -40,6 +42,7 @@
 
 .navbar-brand:hover {
   color: white;
+  display: inline;
 }
 
 .navbar {
@@ -49,16 +52,16 @@
 }
 
 .nav-item{
-  font-size: 3em;
+  font-size: 2.5em;
   margin-right: 1em; 
 }
 
 .nav-link{
-  color: white;
+  color: #150F58;
 }
 
 .nav-link:hover {
-  color: #150F58 ;
+  color: white ;
 }
 
 #navbar-content{
@@ -67,7 +70,8 @@
 }
 
 
-.li { display: inline;
+.li { 
+  display: inline;
 	color: green; 
 }
 
@@ -86,15 +90,60 @@
   padding: 10px;
   margin-top: 2em;
 }
+
 .grid-item {
   background-color: transparent;
   border: 1px solid rgba(0, 0, 0, 0.8);
   padding: 20px;
   font-size: 30px;
   text-align: center;
-  color: 
 }
 
 #main_page{
-  background-color: #3AABB5  ;
+  background-color: #3AABB5;
+  height: 1000px;
+  overflow: auto;
+  flex-flow: row wrap;
 }
+
+#logo_img{
+  height:30px;
+  width:40px;
+}
+
+#create_account_button{
+  font-size: 1.5em;
+  margin-left: 250px;
+  color: white;
+  :hover{
+    color: #150F58;
+  };
+}
+.order_button{
+  height:50px;
+  width: 100px;
+}
+
+.form-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+/* Add some margins for each label */
+.form-inline label {
+  margin: 5px 10px 5px 0;
+}
+
+/* Style the input fields */
+.form-inline input {
+  vertical-align: middle;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+
+
+
