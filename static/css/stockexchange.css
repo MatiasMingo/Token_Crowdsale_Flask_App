@@ -1,0 +1,68 @@
+#container_exchange{
+	margin-top: 200px;
+}
+
+#ecoexchange-logo{
+	padding-left: 1em;
+	font-size: 8em;
+	font-style: italic;
+	padding-top: 0.5em;
+	color: #125156;
+}
+
+#slogan_ecoexchange{
+	font-size: 3em;
+	padding-top: 1em;
+}
+
+.buy-token-title{
+	font-size: 1.7em;
+	color: #125156;
+}
+
+#titulo-token-for-sale{
+	font-size: 2.5em;
+	color: #FCB6BE;
+	font-style: italic;
+}
+
+#stock_exchange_title{
+	margin-top:20px;
+	text-align: center;
+	font-size: 2em;
+	color:#840B3E;
+	margin-bottom: 20px;
+}
+
+#stocks_grid{
+  	display: inline-block;
+}
+
+.stock_div{
+    height: 400px;
+    width: 1100px;
+    border: 5px solid #125156;
+}
+
+.chart{
+    margin-right: -10px;
+    margin-top: -300px;
+    height: 600px;
+    width: 500px;
+}
+
+.token_description{
+	margin-top: 70px;
+	margin-left: 30px;
+	width: 500px;
+	h2{
+		font-size: 3em;
+	};
+}
+
+.stock_name{
+    font-size: 2em;
+    color: white;
+    margin-left: 30px;
+
+}

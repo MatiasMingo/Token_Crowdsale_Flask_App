@@ -14,8 +14,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime
 from web3 import Web3
-from get_token_details import get_token_details, write_token_price
-from get_orders_dict import get_orders_dict, write_orders_dict
+from token_details import get_token_details, write_token_price
+from orders_dict import get_orders_dict, write_orders_dict
  
 ganache_url = "http://127.0.0.1:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
@@ -72,7 +72,6 @@ def activate_job():
         else:
             for order_price in current_orders_dict.keys():
               num_transactions, transactions_list, undone_orders_dict= check_num_transactions(order_price, current_orders_dict[order_price])
-              print("Nº de trasacciones para {}:{}{}".format(order_price, num_transactions, lead_price))
               if lead_amount < num_transactions:
                 print("si")
                 lead_amount = num_transactions
@@ -141,11 +140,11 @@ def signup():
     return render_template('signup.html', form=form)
 
 """Dashboard only accesible if logged in"""
-@app.route('/ecoexchange')
+@app.route('/stockexchange')
 @login_required
-def ecoexchange():
+def stockexchange():
     orders_dict = get_orders_dict("Mitsein")
-    return render_template('ecoexchange.html', name=current_user.email, orders_dict=orders_dict, token_price=current_price)
+    return render_template('stockexchange.html', name=current_user.email, orders_dict=orders_dict, token_price=current_price)
 
 
 @app.route('/chart-data-mitsein')
@@ -366,7 +365,7 @@ def excecute_transactions(price_limit, transactions_list):
     try:
         contract.functions.buyTokens(address_buyer).transact({ 'from': address_buyer, 'gas': 4712388, 'value': amount_wei})
     except:
-        print("Theres been a problem with the transaction")
+        print("There has been a problem with the transaction")
         continue
     new_order = Orders_history_mitsein(buyer_id=address_buyer, seller_id=address_seller, amount=amount, price=price_limit, timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     db.session.add(new_order)
@@ -378,8 +377,6 @@ def excecute_transactions(price_limit, transactions_list):
 
 
   
-
-
 if __name__ == "__main__":
     db.create_all()
     start_backgrounds()

@@ -9,7 +9,7 @@ Mitsein
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/ecoexchange.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stockexchange.css') }}">
 {% endblock %}
 
 {% block navbar %}
@@ -24,23 +24,28 @@ Mitsein
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto" id="navbar-content">
         <li class="nav-item">
-          <a class="nav-link " href="/ecoexchange" role="button">
-            Financial Sector
+          <a class="nav-link " href="/stockexchange" role="button">
+            Stock Exchange
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            Societal Organization
+            Work
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            Involvement
+            Education
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            For Developers
+            Health
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Holistics
           </a>
         </li>
         <li class="nav-item">
@@ -51,9 +56,9 @@ Mitsein
       </ul>
     </div>
   </nav>
-{% endblock %}
 
-{% block content %}
+{% block content %}{% endblock %}
+
 
 <div class="sidenav">
   <a href="#about">About</a>
@@ -61,14 +66,23 @@ Mitsein
   <a href="#clients">Clients</a>
   <a href="#contact">Contact</a>
 </div>
-<div class="container main">
-  <br>
-  <h1 id="titulo-token-for-sale">Tokens for sale</h1>
-  <br>
-  <div>
-    <h1 class="buy-token-title"> Mitsein</h1>
-    <br>
-    <div class="container">
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="container main" >
+  <h1 id="stock_exchange_title" >Projects & Companies</h1>
+  <div id="stocks_grid">
+    <div class="stock_div">
+    <a class="stock_name" href="/">Mitsein</a>
+    <img src="static/images/hand_holding_1.jpeg" style="width:65px;height:65px;" />
+    <div class="token_description">      
+      <h2>Token que representa el valor percibido de nuestra compañía.</h2>
+      <h2> El proposito de este token es permitir la recaudación de fondos para financiar las necesidades y el progreso del propio organismo social, y por lo tanto, individual.</h2>
+    </div>
+    <div class="container chart" >
       <div class="row">
           <div class="col-12">
               <div class="card">
@@ -79,6 +93,7 @@ Mitsein
           </div>
       </div>
     </div>
+
     <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <!--suppress JSUnresolvedLibraryURL -->
@@ -150,6 +165,10 @@ Mitsein
             }
         });
     </script>
+    </div>
+  </div>
+  <div>
+    <br>
     <br>
     <div>
       <h1>BUY</h1>
@@ -177,13 +196,11 @@ Mitsein
         <button class="order_button" type="submit" value="Sell">Sell</button>
       </form>
     </div>
-    <h1>{{token_price}}</h1>
-    <h1>{{orders_dict}}</h1>
   </div>
   <br>
   <br>
 </div>
-</div>>
+</div>
 
   </div>
   <br>
