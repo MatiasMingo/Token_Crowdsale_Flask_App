@@ -40,29 +40,53 @@
 
 .stock_div{
     height: 400px;
-    width: 1100px;
+    width: 1150px;
     border: 5px solid #125156;
+    margin-bottom: 50px;
 }
 
 .chart{
     margin-right: -10px;
-    margin-top: -300px;
-    height: 600px;
-    width: 500px;
+    margin-top: -200px;
+    width: 570px;
 }
 
 .token_description{
-	margin-top: 70px;
-	margin-left: 30px;
-	width: 500px;
-	h2{
-		font-size: 3em;
-	};
+	margin-top: 20px;
+	margin-left: 24px;
+	width: 570px;
+	font-size: 3em;
 }
 
 .stock_name{
     font-size: 2em;
     color: white;
     margin-left: 30px;
+    margin-top: 80px;
 
+}
+
+.chart_data{
+    margin-top: -80px;
+    margin-left: -170px;
+}
+
+.stock_details_order{
+	display: block;
+}
+
+.data_chart{
+	font-size: 1em;
+    color: #840B3E;
+    margin-left: -400px;
+    margin-top: -20px;
+}
+
+.name_chart_data{
+	color: #840B3E;
+}
+
+.invest_button{
+	margin-left: 400px;
+	margin-top: -100px;
 }

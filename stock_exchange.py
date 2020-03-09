@@ -8,7 +8,7 @@ web3 = Web3(Web3.HTTPProvider(ganache_url))
 class StockExchange:
 
 	def __init__():
-		self.stoks = []
+		self.stocks = []
 
 
 class Stock:
