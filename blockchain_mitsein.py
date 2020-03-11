@@ -9,7 +9,50 @@ from Crypto.Signature import PKCS1_v1_5
 from urllib.parse import urlparse
 
 
-class Blockchain:
+class BlockObject:
+
+	def __init__(self, block_number, timestamp, transactions, nonce, previous_hash, proof_number):
+		self.block_number = block_number
+		self.timestamp = timestamp
+		self.transactions = transactions
+		self.nonce = nonce
+		self.previous_hash = previous_hash
+		self.proof_number = proof_number
+
+
+class TransactionObject:
+
+	def __init__(self, address_sender, sender_private_key, address_receptor, value):
+		"""4 pieces of information that a sender needs to create a transaction"""
+		self.address_sender = address_sender
+		self.sender_private_key = sender_private_key
+		self.address_receptor = address_receptor
+		self.value = value
+
+	def __getattr__(self, attr):
+		return self.data[attr]
+
+	def to_dict(self):
+		"""
+		Returns the transaction information in a Python dictionary format without the 
+		senders private key.
+		"""
+		return OrderedDict({'sender_address': self.sender_address,
+							'recipient_address': self.recipient_address,
+							'value': self.value})
+
+	def sign_transaction(self):
+		"""
+		Takes the transaction information (without the senders private key)
+		and signs it using the senders private key.
+		Sign transaction with private key
+		"""
+		private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
+		signer = PKCS1_v1_5.new(private_key)
+		h = SHA.new(str(self.to_dict()).encode('utf8'))
+		return binascii.hexlify(signer.sign(h)).decode('ascii')
+
+class BlockchainObject:
 
 	def __init__(self):
 		self.chain = list()
@@ -28,10 +71,10 @@ class Blockchain:
 			raise ValueError('Invalid URL')
 
 	def build_genesis(self):
-		self.create_block(0, '00')
+		self.create_block(0, '00', 1)
 
-	def create_block(self, nonce, previous_hash):
-		block = Block(len(self.chain), time(), self.transactions, nonce, previous_hash)
+	def create_block(self, nonce, previous_hash, proof_number):
+		block = BlockObject(len(self.chain), time.time(), self.transactions, nonce, previous_hash, proof_number)
 		self.transactions = list()
 		self.chain.append(block)
 		return block
@@ -45,7 +88,7 @@ class Blockchain:
 		last_block = self.chain[-1]
 		last_hash = self.hash(last_block)
 		nonce = 0
-		while not self.check_validity_proof(self.transactions, last_hash, nonce):
+		while not self.check_validity_proof(self.transaction, last_hash, nonce):
 			"""While the first N digits (dependent of the difficulty) of the 
 			hash_guess arent equal to all 0's add 1 to nonce. The proof is obtained by increasing the nonce."""
 			nonce += 1
@@ -120,46 +163,4 @@ class Blockchain:
 		return verifier.verify(h, binascii.unhexlify(signature))
 
 
-class Block:
-
-	def __init__(block_number, timestamp, transactions, nonce, previous_hash, proof_number):
-		self.block_number = block_number
-		self.timestamp = timestamp
-		self.transactions = transactions
-		self.nonce = nonce
-		self.previous_hash = previous_hash
-		self.proof_number = proof_number
-
-
-class Transaction:
-
-	def __init__(self, address_sender, sender_private_key, address_receptor, value):
-		"""4 pieces of information that a sender needs to create a transaction"""
-		self.address_sender = address_sender
-		self.sender_private_key = sender_private_key
-		self.address_receptor = address_receptor
-		self.value = value
-
-	def __getattr__(self, attr):
-		return self.data[attr]
-
-	def to_dict(self):
-		"""
-		Returns the transaction information in a Python dictionary format without the 
-		senders private key.
-		"""
-		return OrderedDict({'sender_address': self.sender_address,
-							'recipient_address': self.recipient_address,
-							'value': self.value})
-
-	def sign_transaction(self):
-		"""
-		Takes the transaction information (without the senders private key)
-		and signs it using the senders private key.
-		Sign transaction with private key
-		"""
-		private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
-		signer = PKCS1_v1_5.new(private_key)
-		h = SHA.new(str(self.to_dict()).encode('utf8'))
-		return binascii.hexlify(signer.sign(h)).decode('ascii')
 

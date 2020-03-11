@@ -24,30 +24,38 @@ Mitsein
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto" id="navbar-content">
         <li class="nav-item">
-          <a class="nav-link " href="/stockexchange" role="button">
-            Financial Sector
+          <a class="nav-link " href="/" role="button">
+            Home
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            Life oportunities
+            Social coordination
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            Education
+            Stock exchange
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            Health
+            Transparency
           </a>
         </li>
-        <li class="nav-item">
-          <a id="create_account_button" class="nav-link " href="/signup" role="button">
-            Join
-          </a>
-        </li>
+        {% if not current_user %}
+          <li class="nav-item">
+            <a id="create_account_button" class="nav-link " href="/signup" role="button">
+              Join
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a id="profile_button" class="nav-link " href="/profile" role="button">
+              Profile
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </nav>

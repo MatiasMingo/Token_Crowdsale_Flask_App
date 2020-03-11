@@ -8,6 +8,7 @@ import hashlib
 import Crypto
 import Crypto.Random
 import binascii
+import blockchain_mitsein
 from collections import OrderedDict
 from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
@@ -28,7 +29,6 @@ from token_details import get_token_details, write_token_price
 from orders_dict import get_orders_dict, write_orders_dict
 from flask_migrate import Migrate
 from flask_cors import CORS
-from blockchain import Blockchain, Block, Transaction
 
 ganache_url = "http://127.0.0.1:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
@@ -46,15 +46,12 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-blockchain_object = Blockchain()
+blockchain_object = blockchain_mitsein.BlockchainObject()
 
 
-
-
-class User(UserMixin, db.Model):
+class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-    sirname = db.Column(db.String(50))
     age = db.Column(db.Integer)
     email = db.Column(db.String(50), unique=True)
     wallet_address = db.Column(db.String(50), unique=True)
@@ -84,7 +81,7 @@ class Price_history_mitsein(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return Users.query.get(int(user_id))
 
 
 class LoginForm(FlaskForm):
@@ -96,14 +93,12 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    name = StringField('name', validators=[InputRequired(), Length(max=50)])
-    sirname = StringField('sirname', validators=[
-                          InputRequired(), Length(max=50)])
-    age = IntegerField('age', validators=[InputRequired()])
-    email = StringField('email', validators=[InputRequired(), Email(
+    name = StringField('Full name', validators=[InputRequired(), Length(max=50)])
+    age = IntegerField('Age', validators=[InputRequired()])
+    email = StringField('Email', validators=[InputRequired(), Email(
         message='Invalid email'), Length(max=50)])
     wallet_address = StringField(
-        'wallet_address', validators=[InputRequired()])
+        'Wallet address', validators=[InputRequired()])
     password = PasswordField('password', validators=[
                              InputRequired(), Length(min=8, max=80)])
 
@@ -117,11 +112,11 @@ def index():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
-                return redirect(url_for('ecoexchange'))
+                return redirect(url_for('stockexchange'))
         return '<h2>Invalid email or password</h2>'
     return render_template('login.html', form=form)
 
@@ -130,12 +125,12 @@ def login():
 def signup():
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if not user:
             hashed_password = generate_password_hash(
                 form.password.data, method='sha256')
-            new_user = User(email=form.email.data, password=hashed_password, name=form.name.data,
-                            sirname=form.sirname.data, wallet_address=form.wallet_address.data, age=form.age.data)
+            new_user = Users(email=form.email.data, password=hashed_password, name=form.name.data,
+                            balance=0, wallet_address=form.wallet_address.data, age=form.age.data)
             db.session.add(new_user)
             db.session.commit()
             return redirect(url_for('login'))
@@ -152,7 +147,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/profile/{}'.format(current_user))
+@app.route('/profile')
 @login_required
 def profile():
     return render_template('user_profile.html')
@@ -166,6 +161,19 @@ def profile():
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """-------------------------------------------------------Blockchain---------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
+""" 
+Implementación
+
+Ingresar transacción, verificar transacción(after proof of work), obtener respuesta de verificación, editar balances de usuarios y enviar 
+confirmación, agregar nueva tupla de transaccion a base de datos de nodos
+    
+    -Ingresar request de transacción: /transaction/new
+    -Verificar transacción: API request proof of work
+    -Respuesta de proof of work exitoso: Sistema de votos--> Balance de cuentas con el mayor porcentage de votos gana.
+    -Editar balances y enviar confirmación:
+    -Agregar nueva tupla de transaccion a base de datos de nodos
+
+    """
 
 
 @app.route('/blockchain_index')
@@ -179,27 +187,35 @@ def blockchain_configure():
 
 
 """API for transactions and mining"""
+def generate_transaction(sender_address, sender_private_key,recipient_address, amount ):
+    sender_address = request.form['sender_address']
+    sender_private_key = request.form['sender_private_key']
+    recipient_address = request.form['recipient_address']
+    amount = request.form['amount']
+    transaction = blockchain_mitsein.TransactionObject(
+        address_sender, sender_private_key, address_receptor, amount)
+    response = {'transaction': transaction.to_dict(
+    ), 'signature': transaction.sign_transaction()}
 
+    return jsonify(response), 200
 
-@app.route('/transactions/new', methods=['POST'])
+@app.route('/transactions/new', methods=['POST', 'GET'])
 def new_transaction():
-    values = request.form
-    # Check that the required fields are in the POST'ed data
-    required = ['address_sender', 'address_receptor', 'amount', 'signature']
-    if not all(k in values for k in required):
-        return 'Missing values', 400
-    # Create a new Transaction
-    transaction_result = blockchain_object.submit_transaction(
-        values['sender_address'], values['recipient_address'], values['amount'], values['signature'])
-
-    if transaction_result == False:
-        response = {'message': 'Invalid Transaction!'}
-        """jsonify turns the JSON output into a Response object with the application/json mimetype."""
-        return jsonify(response), 406
-    else:
-        response = {
-            'message': 'Transaction will be added to Block ' + str(transaction_result)}
-        return jsonify(response), 201
+    form = PaymentForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email=form.address_sender).first()
+        if user.id == current_user.id:
+            signature = generate_transaction(form.address_sender.data, form.private_key.data, form.address_receptor.data, form.amount.data )[0]["signature"]
+            transaction_result = blockchain_object.submit_transaction(form.address_sender.data, form.address_receptor.data, form.amount.data, signature)
+            if transaction_result == False:
+                response = {'message': 'Invalid Transaction!'}
+                """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+                return jsonify(response), 406
+            else:
+                response = {
+                    'message': 'Transaction will be added to Block ' + str(transaction_result)}
+                return jsonify(response), 201
+    return render_template('payment_form.html', form=form)
 
 
 @app.route('/transactions/get', methods=['GET'])
@@ -226,6 +242,7 @@ def mine():
     """The nonce that generates a hash with the difficulty number of 0's at the beggining of the hash"""
     nonce = blockchain_object.proof_of_work()
     # We must receive a reward for finding the proof.
+
     blockchain_object.submit_transaction(
         sender_address=MINING_SENDER, recipient_address=blockchain_object.node_id, value=MINING_REWARD, signature="")
     # Forge the new Block by adding it to the chain
@@ -329,7 +346,7 @@ def generate_transaction():
     recipient_address = request.form['recipient_address']
     value = request.form['amount']
 
-    transaction = Transaction(
+    transaction = blockchain_mitsein.TransactionObject(
         address_sender, sender_private_key, address_receptor, value)
 
     response = {'transaction': transaction.to_dict(
@@ -346,13 +363,38 @@ blockchain_client.py or python blockchain_client.py -p <PORT NUMBER>.
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
+"""--------------------------------------------------------------------------------------------------------------------------------"""
+"""-------------------------------------------------------USER---------------------------------------------------------------------"""
+"""--------------------------------------------------------------------------------------------------------------------------------"""
+
+
 
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """-------------------------------------------------------DINERO-------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
+class PaymentForm(FlaskForm):
+    address_sender = StringField('Your wallet address:', validators=[InputRequired()])
+    address_receptor = StringField('Destination wallet address', validators=[InputRequired()])
+    amount = IntegerField('Amount (MTS)')
+    private_key = StringField('Your private key:', validators=[InputRequired()])
 
-
-
+@app.route('/payment/new', methods=['POST'])
+def new_payment():
+    form = PaymentForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email=form.address_sender).first()
+        if user.id == current_user.id:
+            signature = generate_transaction(form.address_sender.data, form.private_key.data, form.address_receptor.data, form.amount.data )[0]["signature"]
+            transaction_result = blockchain_object.submit_transaction(form.address_sender.data, form.address_receptor.data, form.amount.data, signature)
+            if transaction_result == False:
+                response = {'message': 'Invalid Transaction!'}
+                """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+                return jsonify(response), 406
+            else:
+                response = {
+                    'message': 'Transaction will be added to Block ' + str(transaction_result)}
+                return jsonify(response), 201
+    return render_template('payment_form.html', form=form)
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
@@ -660,8 +702,8 @@ def excecute_transactions(price_limit, transactions_list):
         address=address,
         abi=abi)
     """
-    User.query.all()
-    User.query.filter_by(address='admin').first()
+    Users.query.all()
+    Users.query.filter_by(address='admin').first()
     for transaction_dict in transactions_list:
         address_buyer = transaction_dict["address_buyer"]
         address_seller = transaction_dict["address_seller"]
@@ -677,7 +719,7 @@ def excecute_transactions(price_limit, transactions_list):
             contract.functions.buyTokens(address_buyer).transact(
                 {'from': address_buyer, 'gas': 4712388, 'value': amount_wei})
             """
-            transaction = Transaction(address_buyer, sender_private_key, address_seller, amount_mts)
+            transaction = blockchain_mitsein.TransactionObject(address_buyer, sender_private_key, address_seller, amount_mts)
             response = {'transaction': transaction.to_dict(
             ), 'signature': transaction.sign_transaction()}
             transaction_result = blockchain_object.submit_transaction(address_buyer, address_seller, amount_mts, response['signature'])

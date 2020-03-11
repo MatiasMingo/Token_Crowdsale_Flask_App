@@ -8,7 +8,7 @@ Mitsein
 {{super()}}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user_profile.css') }}">
 {% endblock %}
 
 {% block navbar %}
@@ -24,26 +24,24 @@ Mitsein
       <ul class="navbar-nav mr-auto" id="navbar-content">
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            Life
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="/stockexchange" role="button">
-            Financial Sector
+            Home
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="/" role="button">
-            Transparent data
+            Social coordination
           </a>
         </li>
-        {% if current_user %}
-          <li class="nav-item">
-            <a id="create_account_button" class="nav-link " href="/signup" role="button">
-              Join
-            </a>
-          </li>
-        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Stock exchange
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Transparency
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
@@ -51,14 +49,10 @@ Mitsein
 
 {% block content %}
   <div class="jumbotron jumbotron-fluid page">
-    <br>
-    <br>
-    <h1 align="center">{% current_user %}</h1>
-    <br>
-    <br>
-    <h1 align="center">{% current_user %}</h1>
-    <br>
-    <br>
+    <div id="user_details">
+      <h2 align="center">Name: {{ current_user.name }}</h2>
+      <h2 align="center">Wallet address: {{ current_user.wallet_address }}</h2>
+    </div>
     <a id="create_wallet_button" class="nav-link " href="/wallet/new" role="button">
       Create Wallet
     </a>
