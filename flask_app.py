@@ -139,6 +139,18 @@ def signup():
 
     return render_template('signup.html', form=form)
 
+@app.route('/check/user', methods=['GET'])
+def check_credentials_user():
+    email = request.args.get('email')
+    password = request.args.get("password")
+    user = Users.query.filter_by(email=email).first()
+    if user:
+        if check_password_hash(user.password, password):
+            return jsonify({'response': True})
+        else:
+            return jsonify({'response': False})
+    return jsonify({'response': False})
+
 
 @app.route('/logout')
 @login_required
