@@ -1,0 +1,92 @@
+#container_exchange{
+	margin-top: 200px;
+}
+
+#ecoexchange-logo{
+	padding-left: 1em;
+	font-size: 8em;
+	font-style: italic;
+	padding-top: 0.5em;
+	color: #125156;
+}
+
+#slogan_ecoexchange{
+	font-size: 3em;
+	padding-top: 1em;
+}
+
+.buy-token-title{
+	font-size: 1.7em;
+	color: #125156;
+}
+
+#titulo-token-for-sale{
+	font-size: 2.5em;
+	color: #FCB6BE;
+	font-style: italic;
+}
+
+#stock_exchange_title{
+	margin-top:20px;
+	text-align: center;
+	font-size: 2em;
+	color:#840B3E;
+	margin-bottom: 20px;
+}
+
+#stocks_grid{
+  	display: inline-block;
+}
+
+.stock_div{
+    height: 400px;
+    width: 1150px;
+    border: 5px solid #125156;
+    margin-bottom: 50px;
+}
+
+.chart{
+    margin-right: -10px;
+    margin-top: -200px;
+    width: 570px;
+}
+
+.token_description{
+	margin-top: 20px;
+	margin-left: 24px;
+	width: 570px;
+	font-size: 3em;
+}
+
+.stock_name{
+    font-size: 2em;
+    color: white;
+    margin-left: 30px;
+    margin-top: 80px;
+
+}
+
+.chart_data{
+    margin-top: -80px;
+    margin-left: -170px;
+}
+
+.stock_details_order{
+	display: block;
+}
+
+.data_chart{
+	font-size: 1em;
+    color: #840B3E;
+    margin-left: -400px;
+    margin-top: -20px;
+}
+
+.name_chart_data{
+	color: #840B3E;
+}
+
+.invest_button{
+	margin-left: 400px;
+	margin-top: -100px;
+}

@@ -1,0 +1,46 @@
+.stock_div{
+    border: 5px solid #125156;
+}
+
+.chart{
+}
+
+#mitsein_token_description{
+    width: 70%;
+    margin-left: 300px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    h2{
+        font-size: 5em;
+    }
+}
+
+.stock_name{
+    font-size: 2em;
+    color: white;
+
+}
+
+.chart_data{
+}
+
+.stock_details_order{
+	display: block;
+}
+
+.data_chart{
+	font-size: 1em;
+    color: #840B3E;
+
+}
+
+.name_chart_data{
+	color: #840B3E;
+}
+
+#mitsein_page_title{
+    margin-top:200px;
+    text-align: center;
+    font-size: 7em;
+    color: white;
+}

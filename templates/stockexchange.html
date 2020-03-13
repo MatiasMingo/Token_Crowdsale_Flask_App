@@ -1,0 +1,201 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}
+Mitsein
+{% endblock %}
+ 
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stockexchange.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<div id="main_page">
+  <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">Mitsein</a>
+    <img src="static/images/hand_holding_1.jpeg" style="width:65px;height:65px;margin-top:30px;margin-left: -20px;" />
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto" id="navbar-content">
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Social coordination
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Stock exchange
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/" role="button">
+            Transparency
+          </a>
+        </li>
+        {% if not current_user %}
+          <li class="nav-item">
+            <a id="create_account_button" class="nav-link " href="/signup" role="button">
+              Join
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a id="profile_button" class="nav-link " href="/profile" role="button">
+              Profile
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+{% block content %}{% endblock %}
+
+
+  <div class="sidenav">
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#clients">Clients</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <div class="container main" >
+    <h1 id="stock_exchange_title" >Projects & Companies</h1>
+    <div id="stocks_grid">
+      <div class="stock_div">
+        <br>
+        <a class="stock_name" href="/mitsein_token_page">Mitsein</a>
+        <img src="static/images/hand_holding_1.jpeg" style="width:65px;height:65px;margin-top:-50px;" />
+        <div class="token_description">      
+          <h2>Token que representa el valor percibido de nuestra compañía.</h2>
+          <h2> El proposito de este token es permitir la recaudación de fondos para financiar las necesidades y el progreso del propio organismo social, y por lo tanto, individual.</h2>
+        </div>
+        <div class="container chart" >
+          <div class="row">
+              <div class="col-12">
+                  <div class="card">
+                      <div class="card-body">
+                          <canvas id="canvas"></canvas>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="chart_data">
+            <p class="data_chart">Precio: {{token_price}} ETH</p>
+            <p class="data_chart">Valuación:{{valuation}} USD</p>
+            <p class="data_chart">Variación (24hrs):{{variation}}</p>
+          </div>
+        </div>
+        <form class="form-inline" action="/mitsein_token_page" id="form">
+            <button class="invest_button" type="submit" value="Invest">Invest</button>
+        </form>
+        <!--suppress JSUnresolvedLibraryURL -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <!--suppress JSUnresolvedLibraryURL -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <!--suppress JSUnresolvedLibraryURL -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                const config = {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: "Mitsein Token Price",
+                            backgroundColor: 'rgb(255, 99, 132)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            data: [],
+                            fill: false,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true,
+                            text: 'Real Time Chart'
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Time'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Value (ETH)'
+                                }
+                            }]
+                        }
+                    }
+                };
+
+                const context = document.getElementById('canvas').getContext('2d');
+
+                const lineChart = new Chart(context, config);
+
+                const source = new EventSource("/chart-data-mitsein");
+
+                source.onmessage = function (event) {
+                    const data = JSON.parse(event.data);
+                    if (config.data.labels.length === 1000) {
+                        config.data.labels.shift();
+                        config.data.datasets[0].data.shift();
+                    }
+                    config.data.labels.push(data.time);
+                    config.data.datasets[0].data.push(data.value);
+                    lineChart.update();
+                }
+            });
+        </script>
+      </div>
+      <div class="stock_div">
+        <br>
+        <a class="stock_name" href="/mitsein_token_page">Atacama Solar</a>
+        <div class="token_description">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<br>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+{% endblock %}
