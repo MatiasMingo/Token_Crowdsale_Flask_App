@@ -1,4 +1,4 @@
-import json
+"""import json
 from web3 import Web3
 
 ganache_url = "http://127.0.0.1:8545"
@@ -19,3 +19,4 @@ print(contract.functions.weiRaised().transact({"from": secondary_address}))
 print("weiRaised transactor account balance: {}".format((web3.eth.getBalance(secondary_address)/1000000000000000000)))
 print("Contract owner: {}".format((web3.eth.getBalance(address)/1000000000000000000)))
 print("Metamask account: {}".format((web3.eth.getBalance(address_buyer)/1000000000000000000)))
+"""
