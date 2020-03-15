@@ -30,7 +30,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 ganache_url = "http://127.0.0.1:8545"
-web3 = Web3(Web3.HTTPProvider(ganache_url))
+#web3 = Web3(Web3.HTTPProvider(ganache_url))
 
 MINING_SENDER = "THE BLOCKCHAIN"
 
@@ -510,7 +510,7 @@ def buy_stock():
     address_buyer = request.form.get('address', 0)
     orders_dict = get_orders_dict("Mitsein")
     """AQUÍ CAMBIAR METODOLOGIA PARA ENCONTRAR LA CANTIDAD DE FONDOS. ¿DESDE DB? ¿GUARDAR EN OBEJTO DE BLOCKCHAIN?"""
-    if web3.eth.getBalance(address_buyer) >= amount_wei:
+    #if web3.eth.getBalance(address_buyer) >= amount_wei:
         if price_limit != current_price:
             amount_token = amount_eth/price_limit
             if str(price_limit) not in orders_dict.keys():
@@ -553,7 +553,7 @@ def sell_stock():
     address_seller = request.form.get('address', 0)
     orders_dict = get_orders_dict("Mitsein")
     """AQUÍ CAMBIAR METODOLOGIA PARA ENCONTRAR LA CANTIDAD DE FONDOS. ¿DESDE DB? ¿GUARDAR EN OBEJTO DE BLOCKCHAIN?"""
-    if web3.eth.getBalance(address_seller) >= amount_wei:
+    #if web3.eth.getBalance(address_seller) >= amount_wei:
         if price_limit != current_price:
             amount_token = amount_eth/price_limit
             if str(price_limit) not in orders_dict.keys():
