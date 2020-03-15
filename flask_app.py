@@ -29,7 +29,7 @@ from orders_dict import get_orders_dict, write_orders_dict
 from flask_migrate import Migrate
 from flask_cors import CORS
 
-#ganache_url = "http://127.0.0.1:8545"
+ganache_url = "http://127.0.0.1:8545"
 #web3 = Web3(Web3.HTTPProvider(ganache_url))
 
 MINING_SENDER = "THE BLOCKCHAIN"
@@ -391,21 +391,24 @@ class PaymentForm(FlaskForm):
 
 @app.route('/payment/new', methods=['POST'])
 def new_payment():
-    form = PaymentForm()
-    if form.validate_on_submit():
-        user = Users.query.filter_by(email=form.address_sender).first()
-        if user.id == current_user.id:
-            signature = generate_transaction(form.address_sender.data, form.private_key.data, form.address_receptor.data, form.amount.data )[0]["signature"]
-            transaction_result = blockchain_object.submit_transaction(form.address_sender.data, form.address_receptor.data, form.amount.data, signature)
-            if transaction_result == False:
-                response = {'message': 'Invalid Transaction!'}
-                """jsonify turns the JSON output into a Response object with the application/json mimetype."""
-                return jsonify(response), 406
-            else:
-                response = {
-                    'message': 'Transaction will be added to Block ' + str(transaction_result)}
-                return jsonify(response), 201
-    return render_template('payment_form.html', form=form)
+    amount = request.json["amount"]
+    address_recipient = request.json["address_recipient"]
+    address_sender = request.json["address_sender"]
+    user_sender = Users.query.filter_by(email=form.address_sender).first()
+    user_recipient = 
+    if user.id == current_user.id:
+        signature = generate_transaction(form.address_sender.data, form.private_key.data, form.address_receptor.data, form.amount.data )[0]["signature"]
+        transaction_result = blockchain_object.submit_transaction(form.address_sender.data, form.address_receptor.data, form.amount.data, signature)
+        if transaction_result == False:
+            response = {'message': 'Invalid Transaction!'}
+            """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+            return jsonify(response), 406
+        else:
+            response = {
+                'message': 'Transaction will be added to Block ' + str(transaction_result)}
+            return jsonify(response), 201
+    else:
+        pass
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
