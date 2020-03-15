@@ -24,7 +24,6 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime
-from web3 import Web3
 from token_details import get_token_details, write_token_price
 from orders_dict import get_orders_dict, write_orders_dict
 from flask_migrate import Migrate
