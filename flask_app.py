@@ -511,37 +511,37 @@ def buy_stock():
     orders_dict = get_orders_dict("Mitsein")
     """AQUÍ CAMBIAR METODOLOGIA PARA ENCONTRAR LA CANTIDAD DE FONDOS. ¿DESDE DB? ¿GUARDAR EN OBEJTO DE BLOCKCHAIN?"""
     #if web3.eth.getBalance(address_buyer) >= amount_wei:
-        if price_limit != current_price:
-            amount_token = amount_eth/price_limit
-            if str(price_limit) not in orders_dict.keys():
+    if price_limit != current_price:
+        amount_token = amount_eth/price_limit
+        if str(price_limit) not in orders_dict.keys():
+            orders_dict[str(price_limit)] = {
+                "buy": [{'address': address_buyer, 'amount': amount_token}], "sell": []}
+        else:
+            if orders_dict[str(price_limit)] != None:
+                orders_dict[str(price_limit)]["buy"].append(
+                    {'address': address_buyer, 'amount': amount_token})
+            else:
                 orders_dict[str(price_limit)] = {
                     "buy": [{'address': address_buyer, 'amount': amount_token}], "sell": []}
-            else:
-                if orders_dict[str(price_limit)] != None:
-                    orders_dict[str(price_limit)]["buy"].append(
-                        {'address': address_buyer, 'amount': amount_token})
-                else:
-                    orders_dict[str(price_limit)] = {
-                        "buy": [{'address': address_buyer, 'amount': amount_token}], "sell": []}
+    else:
+        amount_token = amount_eth/current_price
+        if str(current_price) not in orders_dict.keys():
+            orders_dict[str(current_price)] = {
+                "buy": [{'address': address_buyer, 'amount': amount_token}], "sell": []}
         else:
-            amount_token = amount_eth/current_price
-            if str(current_price) not in orders_dict.keys():
+            if orders_dict[str(current_price)] != None:
+                orders_dict[str(current_price)]["buy"].append(
+                    {'address': address_buyer, 'amount': amount_token})
+            else:
                 orders_dict[str(current_price)] = {
                     "buy": [{'address': address_buyer, 'amount': amount_token}], "sell": []}
-            else:
-                if orders_dict[str(current_price)] != None:
-                    orders_dict[str(current_price)]["buy"].append(
-                        {'address': address_buyer, 'amount': amount_token})
-                else:
-                    orders_dict[str(current_price)] = {
-                        "buy": [{'address': address_buyer, 'amount': amount_token}], "sell": []}
-        write_orders_dict("Mitsein", orders_dict)
-        orders_dict = get_orders_dict("Mitsein")
-        print("Orden de Compra realizada. Nuevo diccionario de ordenes:{}".format(
-            orders_dict))
-    else:
-        pass
-    return redirect(url_for('stockexchange'))
+    write_orders_dict("Mitsein", orders_dict)
+    orders_dict = get_orders_dict("Mitsein")
+    print("Orden de Compra realizada. Nuevo diccionario de ordenes:{}".format(
+        orders_dict))
+else:
+    pass
+return redirect(url_for('stockexchange'))
 
 
 @app.route('/sell-stock-mitsein', methods=['POST'])
@@ -554,37 +554,37 @@ def sell_stock():
     orders_dict = get_orders_dict("Mitsein")
     """AQUÍ CAMBIAR METODOLOGIA PARA ENCONTRAR LA CANTIDAD DE FONDOS. ¿DESDE DB? ¿GUARDAR EN OBEJTO DE BLOCKCHAIN?"""
     #if web3.eth.getBalance(address_seller) >= amount_wei:
-        if price_limit != current_price:
-            amount_token = amount_eth/price_limit
-            if str(price_limit) not in orders_dict.keys():
-                orders_dict[str(price_limit)] = {
-                    "sell": [{'address': address_seller, 'amount': amount_token}], "buy": []}
-            else:
-                if "sell" in orders_dict[str(price_limit)].keys():
-                    orders_dict[str(price_limit)]["sell"].append(
-                        {'address': address_seller, 'amount': amount_token})
-                else:
-                    orders_dict[str(price_limit)]["sell"] = [
-                        {'address': address_seller, 'amount': amount_token}]
+    if price_limit != current_price:
+        amount_token = amount_eth/price_limit
+        if str(price_limit) not in orders_dict.keys():
+            orders_dict[str(price_limit)] = {
+                "sell": [{'address': address_seller, 'amount': amount_token}], "buy": []}
         else:
-            amount_token = amount_eth/current_price
-            if str(current_price) not in orders_dict.keys():
-                orders_dict[str(current_price)] = {
-                    "sell": [{'address': address_seller, 'amount': amount_token}], "buy": []}
+            if "sell" in orders_dict[str(price_limit)].keys():
+                orders_dict[str(price_limit)]["sell"].append(
+                    {'address': address_seller, 'amount': amount_token})
             else:
-                if "sell" in orders_dict[str(current_price)].keys():
-                    orders_dict[str(current_price)]["sell"].append(
-                        {'address': address_seller, 'amount': amount_token})
-                else:
-                    orders_dict[str(current_price)]["sell"] = [
-                        {'address': address_seller, 'amount': amount_token}]
-        write_orders_dict("Mitsein", orders_dict)
-        orders_dict = get_orders_dict("Mitsein")
-        print("Orden de Venta realizada. Nuevo diccionario de ordenes:{}".format(
-            orders_dict))
+                orders_dict[str(price_limit)]["sell"] = [
+                    {'address': address_seller, 'amount': amount_token}]
     else:
-        pass
-    return redirect(url_for('stockexchange'))
+        amount_token = amount_eth/current_price
+        if str(current_price) not in orders_dict.keys():
+            orders_dict[str(current_price)] = {
+                "sell": [{'address': address_seller, 'amount': amount_token}], "buy": []}
+        else:
+            if "sell" in orders_dict[str(current_price)].keys():
+                orders_dict[str(current_price)]["sell"].append(
+                    {'address': address_seller, 'amount': amount_token})
+            else:
+                orders_dict[str(current_price)]["sell"] = [
+                    {'address': address_seller, 'amount': amount_token}]
+    write_orders_dict("Mitsein", orders_dict)
+    orders_dict = get_orders_dict("Mitsein")
+    print("Orden de Venta realizada. Nuevo diccionario de ordenes:{}".format(
+        orders_dict))
+else:
+    pass
+return redirect(url_for('stockexchange'))
 
 
 def start_backgrounds():
