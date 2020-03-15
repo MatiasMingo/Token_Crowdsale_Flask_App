@@ -29,7 +29,7 @@ from orders_dict import get_orders_dict, write_orders_dict
 from flask_migrate import Migrate
 from flask_cors import CORS
 
-ganache_url = "http://127.0.0.1:8545"
+#ganache_url = "http://127.0.0.1:8545"
 #web3 = Web3(Web3.HTTPProvider(ganache_url))
 
 MINING_SENDER = "THE BLOCKCHAIN"
