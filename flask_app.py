@@ -539,9 +539,8 @@ def buy_stock():
     orders_dict = get_orders_dict("Mitsein")
     print("Orden de Compra realizada. Nuevo diccionario de ordenes:{}".format(
         orders_dict))
-else:
-    pass
-return redirect(url_for('stockexchange'))
+
+    return redirect(url_for('stockexchange'))
 
 
 @app.route('/sell-stock-mitsein', methods=['POST'])
@@ -582,9 +581,7 @@ def sell_stock():
     orders_dict = get_orders_dict("Mitsein")
     print("Orden de Venta realizada. Nuevo diccionario de ordenes:{}".format(
         orders_dict))
-else:
-    pass
-return redirect(url_for('stockexchange'))
+    return redirect(url_for('stockexchange'))
 
 
 def start_backgrounds():
