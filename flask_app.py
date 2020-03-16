@@ -406,16 +406,15 @@ def new_payment():
                 """jsonify turns the JSON output into a Response object with the application/json mimetype."""
                 return jsonify(response), 406
             else:
-                response = {
-                    'message': 'Transaction will be added to Block ' + str(transaction_result)}
+                response = {'message': 'Transaction will be added to Block ' + str(transaction_result)}
                 return jsonify(response), 201
         else:
             response = {'message': 'Invalid recipient address!'}
-                """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+            """jsonify turns the JSON output into a Response object with the application/json mimetype."""
             return jsonify(response), 406
     else:
         response = {'message': 'Invalid sender address!'}
-            """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+        """jsonify turns the JSON output into a Response object with the application/json mimetype."""
         return jsonify(response), 406
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
