@@ -394,21 +394,29 @@ def new_payment():
     amount = request.json["amount"]
     address_recipient = request.json["address_recipient"]
     address_sender = request.json["address_sender"]
+    sender_private_key = request.json["private_key"]
     user_sender = Users.query.filter_by(email=form.address_sender).first()
-    user_recipient = 
-    if user.id == current_user.id:
-        signature = generate_transaction(form.address_sender.data, form.private_key.data, form.address_receptor.data, form.amount.data )[0]["signature"]
-        transaction_result = blockchain_object.submit_transaction(form.address_sender.data, form.address_receptor.data, form.amount.data, signature)
-        if transaction_result == False:
-            response = {'message': 'Invalid Transaction!'}
-            """jsonify turns the JSON output into a Response object with the application/json mimetype."""
-            return jsonify(response), 406
+    user_recipient = Users.query.filter_by(email=form.address_recipient).first()
+    if user_sender && user_recipient:
+        if user_recipient:
+            signature = generate_transaction(address_sender, sender_private_key, address_recipient, amount )[0]["signature"]
+            transaction_result = blockchain_object.submit_transaction(address_sender, address_recipient, amount, signature)
+            if transaction_result == False:
+                response = {'message': 'Invalid Transaction. Transaction could not be added to block!'}
+                """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+                return jsonify(response), 406
+            else:
+                response = {
+                    'message': 'Transaction will be added to Block ' + str(transaction_result)}
+                return jsonify(response), 201
         else:
-            response = {
-                'message': 'Transaction will be added to Block ' + str(transaction_result)}
-            return jsonify(response), 201
+            response = {'message': 'Invalid recipient address!'}
+                """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+            return jsonify(response), 406
     else:
-        pass
+        response = {'message': 'Invalid sender address!'}
+            """jsonify turns the JSON output into a Response object with the application/json mimetype."""
+        return jsonify(response), 406
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
