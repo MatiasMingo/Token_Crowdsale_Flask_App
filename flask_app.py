@@ -397,7 +397,7 @@ def new_payment():
     sender_private_key = request.json["private_key"]
     user_sender = Users.query.filter_by(email=form.address_sender).first()
     user_recipient = Users.query.filter_by(email=form.address_recipient).first()
-    if user_sender && user_recipient:
+    if user_sender:
         if user_recipient:
             signature = generate_transaction(address_sender, sender_private_key, address_recipient, amount )[0]["signature"]
             transaction_result = blockchain_object.submit_transaction(address_sender, address_recipient, amount, signature)
