@@ -165,7 +165,6 @@ def profile():
 
 
 @app.route('/API_documentation')
-@login_required
 def profile():
     return render_template('API_documentation.html')
 
