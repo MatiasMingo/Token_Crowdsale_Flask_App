@@ -7,7 +7,6 @@ Mitsein
 {% block styles %}
 {{super()}}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/api.css') }}">
 {% endblock %}
 
@@ -45,7 +44,7 @@ Mitsein
           </li>
         {% else %}
           <li class="nav-item">
-            <a id="profile_button" class="nav-link " href="/transactions/new" role="button">
+            <a  class="nav-link " href="/transactions/new" role="button">
               Pay
             </a>
           </li>
@@ -55,7 +54,7 @@ Mitsein
             </a>
           </li>
           <li class="nav-item">
-            <a id="profile_button" class="nav-link " href="/logout" role="button">
+            <a  class="nav-link " href="/logout" role="button">
               Logout
             </a>
           </li>
