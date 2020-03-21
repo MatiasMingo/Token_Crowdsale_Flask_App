@@ -7,6 +7,8 @@ from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from urllib.parse import urlparse
+from collections import OrderedDict
+import binascii
 
 
 class BlockObject:
@@ -22,24 +24,21 @@ class BlockObject:
 
 class TransactionObject:
 
-	def __init__(self, address_sender, sender_private_key, address_receptor, value):
+	def __init__(self, address_sender, sender_private_key, address_recipient, amount):
 		"""4 pieces of information that a sender needs to create a transaction"""
 		self.address_sender = address_sender
 		self.sender_private_key = sender_private_key
-		self.address_receptor = address_receptor
-		self.value = value
-
-	def __getattr__(self, attr):
-		return self.data[attr]
+		self.address_recipient = address_recipient
+		self.amount = amount
 
 	def to_dict(self):
 		"""
 		Returns the transaction information in a Python dictionary format without the 
 		senders private key.
 		"""
-		return OrderedDict({'sender_address': self.sender_address,
-							'recipient_address': self.recipient_address,
-							'value': self.value})
+		return OrderedDict({'address_sender': self.address_sender,
+							'address_recipient': self.address_recipient,
+							'amount': self.amount})
 
 	def sign_transaction(self):
 		"""
@@ -47,6 +46,7 @@ class TransactionObject:
 		and signs it using the senders private key.
 		Sign transaction with private key
 		"""
+		print(self.sender_private_key)
 		private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
 		signer = PKCS1_v1_5.new(private_key)
 		h = SHA.new(str(self.to_dict()).encode('utf8'))

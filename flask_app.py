@@ -28,6 +28,8 @@ from token_details import get_token_details, write_token_price
 from orders_dict import get_orders_dict, write_orders_dict
 from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_mail import Message, Mail
+
 
 ganache_url = "http://127.0.0.1:8545"
 #web3 = Web3(Web3.HTTPProvider(ganache_url))
@@ -36,6 +38,17 @@ MINING_SENDER = "THE BLOCKCHAIN"
 
 
 app = Flask(__name__)
+mail_settings = {
+    "MAIL_SERVER": 'smtp.gmail.com',
+    "MAIL_PORT": 465,
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": True,
+    "MAIL_USERNAME": os.environ['EMAIL_USER'],
+    "MAIL_PASSWORD": os.environ['EMAIL_PASSWORD']
+}
+
+app.config.update(mail_settings)
+app.config.from_object(__name__)
 random.seed()
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -45,6 +58,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+mail = Mail(app)
 blockchain_object = blockchain_mitsein.BlockchainObject()
 
 
@@ -72,11 +86,44 @@ class Price_history_mitsein(db.Model):
     price = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime)
 
+class Chain(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    age = db.Column(db.Integer)
+    email = db.Column(db.String(50), unique=True)
+    wallet_address = db.Column(db.String(50), unique=True)
+    balance = db.Column(db.Integer)
+    password = db.Column(db.String(80))
 
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    age = db.Column(db.Integer)
+    email = db.Column(db.String(50), unique=True)
+    wallet_address = db.Column(db.String(50), unique=True)
+    balance = db.Column(db.Integer)
+    password = db.Column(db.String(80))
+
+class Nodes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    age = db.Column(db.Integer)
+    email = db.Column(db.String(50), unique=True)
+    wallet_address = db.Column(db.String(50), unique=True)
+    balance = db.Column(db.Integer)
+    password = db.Column(db.String(80))
+
+class TransactionData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    age = db.Column(db.Integer)
+    email = db.Column(db.String(50), unique=True)
+    wallet_address = db.Column(db.String(50), unique=True)
+    balance = db.Column(db.Integer)
+    password = db.Column(db.String(80))
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """-------------------------------------------------------SESSION------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -96,15 +143,13 @@ class RegisterForm(FlaskForm):
     age = IntegerField('Age', validators=[InputRequired()])
     email = StringField('Email', validators=[InputRequired(), Email(
         message='Invalid email'), Length(max=50)])
-    wallet_address = StringField(
-        'Wallet address', validators=[InputRequired()])
     password = PasswordField('password', validators=[
                              InputRequired(), Length(min=8, max=80)])
 
 
 @app.route("/")
 def index():
-    return render_template("homepage.html", name="homepage", current_user=current_user)
+    return render_template("homepage.html", name="homepage", current_user=current_user, blockchain_object=blockchain_object)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -123,13 +168,17 @@ def login():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = RegisterForm()
+    new_wallet = new_wallet_method()
+    public_key = new_wallet['public_key']
+    private_key = new_wallet['private_key']
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
         if not user:
             hashed_password = generate_password_hash(
                 form.password.data, method='sha256')
             new_user = Users(email=form.email.data, password=hashed_password, name=form.name.data,
-                            balance=0, wallet_address=form.wallet_address.data, age=form.age.data)
+                            balance=0, wallet_address=public_key, age=form.age.data)
+            send_mail(form.name.data, form.email.data,"Welcome to Mitsein {}".format(form.name.data) ,"Your private key is: {}. With this key you can make transactions. Please copy and save it in a safe place.".format(private_key))
             db.session.add(new_user)
             db.session.commit()
             return redirect(url_for('login'))
@@ -168,6 +217,18 @@ def profile():
 def api_documentation():
     return render_template('API_documentation.html')
 
+@app.route('/Blockchain')
+def blockchain():
+    return render_template('blockchain.html', current_user=current_user, blockchain=blockchain_object)
+
+def send_mail(recipient_name, recipient_mail, subject, body):
+    with app.app_context():
+        msg = Message(subject="{}".format(subject),
+                      sender=app.config.get("MAIL_USERNAME"),
+                      recipients=[recipient_mail], # replace with your email for testing
+                      body="{}".format(body))
+        mail.send(msg)
+
 
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
@@ -191,10 +252,6 @@ confirmación, agregar nueva tupla de transaccion a base de datos de nodos
 
     """
 
-
-@app.route('/blockchain_index')
-def blockchain_index():
-    return render_template('./blockchain_index.html')
 
 
 @app.route('/blockchain_configure')
@@ -342,7 +399,17 @@ def new_wallet():
     }
     return jsonify(response), 200
 
-
+def new_wallet_method():
+    """¿AQUÍ DEBO ASEGURARME DE QUE EL ADDRESS SEA UNICO Y DE GUARDAR LOS DATOS DEL WALLET DEL USUARIO EN UNA BASE DE DATOS?
+    EL DISTRIBUTED LEDGER ES SOLO DE LAS TRANSACCIONES, NO DE LOS DATOS BANCARIOS DE LOS USUARIOS?"""
+    random_gen = Crypto.Random.new().read
+    private_key = RSA.generate(1024, random_gen)
+    public_key = private_key.publickey()
+    response = {
+        'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
+        'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii')
+    }
+    return response
 """jsonify() returns a flask.Response() object that already has the approriate content-type header
 'application/json' for use with json responses. The json.dumps() method will just return an encoded
 string, which would require manually adding the MIME type header."""
@@ -394,17 +461,26 @@ class PaymentForm(FlaskForm):
     amount = IntegerField('Amount (MTS)')
     private_key = StringField('Your private key:', validators=[InputRequired()])
 
-@app.route('/payment/new', methods=['POST'])
+def generate_transaction_method(address_sender, sender_private_key, address_recipient, amount):
+    transaction = blockchain_mitsein.TransactionObject(
+        address_sender, sender_private_key, address_recipient, amount)
+    response = {'transaction': transaction.to_dict(
+    ), 'signature': transaction.sign_transaction()}
+    return jsonify(response), 200
+
+@app.route('/new/payment', methods=['POST'])
 def new_payment():
     amount = request.json["amount"]
     address_recipient = request.json["address_recipient"]
     address_sender = request.json["address_sender"]
     sender_private_key = request.json["private_key"]
-    user_sender = Users.query.filter_by(email=form.address_sender).first()
-    user_recipient = Users.query.filter_by(email=form.address_recipient).first()
+    user_sender = Users.query.filter_by(wallet_address=address_sender).first()
+    user_recipient = Users.query.filter_by(wallet_address=address_recipient).first()
     if user_sender:
         if user_recipient:
-            signature = generate_transaction(address_sender, sender_private_key, address_recipient, amount )[0]["signature"]
+            print(address_recipient)
+            signature = generate_transaction_method(address_sender, sender_private_key, address_recipient, amount )[0]["signature"]
+            print(signature)
             transaction_result = blockchain_object.submit_transaction(address_sender, address_recipient, amount, signature)
             if transaction_result == False:
                 response = {'message': 'Invalid Transaction. Transaction could not be added to block!'}
