@@ -29,6 +29,7 @@ from orders_dict import get_orders_dict, write_orders_dict
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_mail import Message, Mail
+from web_crawling import google_search
 
 
 ganache_url = "http://127.0.0.1:8545"
@@ -38,6 +39,7 @@ MINING_SENDER = "THE BLOCKCHAIN"
 
 
 app = Flask(__name__)
+
 mail_settings = {
     "MAIL_SERVER": 'smtp.gmail.com',
     "MAIL_PORT": 465,
@@ -212,10 +214,13 @@ def logout():
 def profile():
     return render_template('user_profile.html')
 
-
 @app.route('/API_documentation')
 def api_documentation():
     return render_template('API_documentation.html')
+
+@app.route('/social_coordination')
+def social_coordination():
+    return render_template('social_coordination.html')
 
 @app.route('/Blockchain')
 def blockchain():
@@ -391,7 +396,7 @@ def new_wallet():
     """¿AQUÍ DEBO ASEGURARME DE QUE EL ADDRESS SEA UNICO Y DE GUARDAR LOS DATOS DEL WALLET DEL USUARIO EN UNA BASE DE DATOS?
     EL DISTRIBUTED LEDGER ES SOLO DE LAS TRANSACCIONES, NO DE LOS DATOS BANCARIOS DE LOS USUARIOS?"""
     random_gen = Crypto.Random.new().read
-    private_key = RSA.generate(1024, random_gen)
+    key = RSA.generate(2048)
     public_key = private_key.publickey()
     response = {
         'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
@@ -428,7 +433,6 @@ def generate_transaction():
     sender_private_key = request.form['sender_private_key']
     recipient_address = request.form['recipient_address']
     value = request.form['amount']
-
     transaction = blockchain_mitsein.TransactionObject(
         address_sender, sender_private_key, address_receptor, value)
 
@@ -466,7 +470,7 @@ def generate_transaction_method(address_sender, sender_private_key, address_reci
         address_sender, sender_private_key, address_recipient, amount)
     response = {'transaction': transaction.to_dict(
     ), 'signature': transaction.sign_transaction()}
-    return jsonify(response), 200
+    return response
 
 @app.route('/new/payment', methods=['POST'])
 def new_payment():
@@ -478,12 +482,12 @@ def new_payment():
     user_recipient = Users.query.filter_by(wallet_address=address_recipient).first()
     if user_sender:
         if user_recipient:
-            print(address_recipient)
-            signature = generate_transaction_method(address_sender, sender_private_key, address_recipient, amount )[0]["signature"]
+            signature = generate_transaction_method(address_sender, sender_private_key, address_recipient, amount )['signature']
             print(signature)
             transaction_result = blockchain_object.submit_transaction(address_sender, address_recipient, amount, signature)
             if transaction_result == False:
                 response = {'message': 'Invalid Transaction. Transaction could not be added to block!'}
+                print('Invalid Transaction. Transaction could not be added to block!')
                 """jsonify turns the JSON output into a Response object with the application/json mimetype."""
                 return jsonify(response), 406
             else:

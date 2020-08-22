@@ -3,8 +3,6 @@
   color: #150F58 ; 
 }
 
-
-
 .sidenav {
   height: 100%;
   width: 160px;
@@ -58,11 +56,11 @@
 }
 
 .nav-link{
-  color: #150F58;
+  color: white;
 }
 
 .nav-link:hover {
-  color: white ;
+  color: #150F58;
 }
 
 #navbar-content{

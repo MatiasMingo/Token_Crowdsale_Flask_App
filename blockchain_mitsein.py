@@ -3,9 +3,9 @@ import time
 import hashlib
 import Crypto
 import Crypto.Random
-from Crypto.Hash import SHA
+from Crypto.Hash import SHA256, SHA, SHA512
 from Crypto.PublicKey import RSA
-from Crypto.Signature import PKCS1_v1_5
+from Crypto.Signature import PKCS1_PSS
 from urllib.parse import urlparse
 from collections import OrderedDict
 import binascii
@@ -46,11 +46,12 @@ class TransactionObject:
 		and signs it using the senders private key.
 		Sign transaction with private key
 		"""
-		print(self.sender_private_key)
-		private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
-		signer = PKCS1_v1_5.new(private_key)
-		h = SHA.new(str(self.to_dict()).encode('utf8'))
-		return binascii.hexlify(signer.sign(h)).decode('ascii')
+		key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
+		sgn = PKCS1_PSS.new(key)
+		h = SHA256.new()
+		h.update("{}:{}:{}".format(self.address_sender,self.address_recipient,self.amount))
+		sgn.sign(h)
+		return sgn.sign(h)
 
 class BlockchainObject:
 
@@ -105,17 +106,17 @@ class BlockchainObject:
 		#Reward for mining a block
 		"""AQUÍ: QUE ES MINING_SENDER??
 		Si el minero es el que hace el submit?"""
+		"""
 		if address_sender == MINING_SENDER:
 			self.transactions.append(transaction)
-			return len(self.chain) + 1
+			return len(self.chain) + 1"""
 		#Manages transactions from wallet to another wallet
+		transaction_verification = self.verify_transaction_signature(address_sender, signature, transaction)
+		if transaction_verification:
+			self.transactions.append(transaction)
+			return len(self.chain) + 1
 		else:
-			transaction_verification = self.verify_transaction_signature(address_sender, signature, transaction)
-			if transaction_verification:
-				self.transactions.append(transaction)
-				return len(self.chain) + 1
-			else:
-				return False
+			return False
 
 	def resolve_conflicts(self):
 		"""
@@ -157,10 +158,11 @@ class BlockchainObject:
 			transactions = block.transactions[:-1]
 
 	def verify_transaction_signature(self, address_sender, signature, transaction): 
-		public_key = RSA.importKey(binascii.unhexlify(address_sender))
-		verifier = PKCS1_v1_5.new(public_key)
-		h = SHA.new(str(transaction).encode('utf8'))
-		return verifier.verify(h, binascii.unhexlify(signature))
+		h = SHA256.new()
+		h.update("{}:{}:{}".format(transaction.address_sender,transaction.address_receptor,transaction.amount))
+		key = RSA.importKey(address_sender)
+		vfy = PKCS1_PSS.new(key)
+		return vfy.verify(h, signature)
 
 
 
