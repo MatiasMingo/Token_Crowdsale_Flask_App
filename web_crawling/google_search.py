@@ -9,9 +9,12 @@ except ImportError:
 # to search 
 def get_google_search_hrefs(query):
 	dict_urls = {}
-	for j in search(query, tld="co.in", num=50, stop=50, pause=2): 
+	for j in search(query, tld="co.in", num=20, stop=20, pause=2): 
+		dict_urls[j] = []
 		try:
-			dict_urls[j] = obtener_hrefs_url(j)
+			for href in obtener_hrefs_url(j):
+				urls =obtener_hrefs_url(href)
+				dict_urls[j].extend(urls)
 		except:
 			dict_urls[j] = []
 	return dict_urls
@@ -31,7 +34,7 @@ def obtener_hrefs_url(url):
     textContent = ""
     links = []
     for a in soup.find_all('a', href=True):
-    	links.append(a['href'])
+    	links.append(url+a['href'])
     """
     for node in soup.findAll('p'):
         textContent += str(node.findAll(text=True))
@@ -51,8 +54,8 @@ def obtener_content_url(url):
     lista_palabras_lower = [palabra.lower() for palabra in lista_palabras]
     return lista_palabras_lower
 
-def obtener_pegas_programador(query):
-	palabras_clave = ["programador"]
+def obtain_matches(query, key_words):
+	palabras_clave = key_words
 	dict_urls = get_google_search_hrefs(query)
 	filtered_list = list()
 	for url, content in dict_urls.items():
@@ -61,9 +64,7 @@ def obtener_pegas_programador(query):
 			for palabra in palabras_clave:
 				if palabra in details_link:
 					filtered_list.append(link)
-	with open("programming_jobs.txt", "w") as programming_jobs_file:
-		for link in filtered_list:
-			programming_jobs_file.write("{} \n \n".format(link))
+	return filtered_list
 	"""
 	posibilities_dict = {}
 	for link in filtered_list:
@@ -97,5 +98,3 @@ def obtener_detalles_terrenos(query):
 		except:
 			continue
 	print(posibilities_dict)
-
-obtener_pegas_programador("se busca programador Santiago Chile")

@@ -1,4 +1,5 @@
 {% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}
 Mitsein
@@ -8,7 +9,8 @@ Mitsein
 {{super()}}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/application.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/social_coordination.css') }}">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 {% endblock %}
 
 {% block navbar %}
@@ -23,23 +25,13 @@ Mitsein
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto" id="navbar-content">
         <li class="nav-item">
-          <a class="nav-link " href="/social_coordination" role="button">
-            Social coordination
-          </a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link " href="/stockexchange" role="button">
             Stock Exchange
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="/" role="button">
-            Transparency
-          </a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link " href="/API_documentation" role="button">
-            API
+            About us
           </a>
         </li>
         {% if not current_user %}
@@ -51,7 +43,7 @@ Mitsein
         {% else %}
           <li class="nav-item">
             <a  class="nav-link " href="/transactions/new" role="button">
-              Pay
+              Bank
             </a>
           </li>
           <li class="nav-item">
@@ -71,17 +63,42 @@ Mitsein
 {% endblock %}
 
 {% block content %}
-  <div class="jumbotron jumbotron-fluid page">
+  <h1 id="title" align="center">Tell us what you want</h1>
+  <div id="search_bar" class="lg-form mt-0">
+    <form  method="POST" action="/social_coordination">
+      {{ form.hidden_tag() }}
+      {{ wtf.form_field(form.text) }}
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  {%for post in posts%} 
+    <div class="div_post"> 
+      <h2 id="text_post">{{post}}</h2>
+    </div>
     <br>
     <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+  {%endfor%} 
+  <div>
+    <h1 id="slogan_1" align="center">El buscador de posibilidades funciona con inteligencia artificial(Deep Q-Learning).</h1>
+    <h1 id="slogan_1" align="center">Aprende mas rapido si se toman una mayor cantidad de decisiones aleatorias.</h1>
+    <h1 id="slogan_1" align="center">Nos obliga a vivir en un nuevo paradigma de vida.</h1>
+  </div>
+  <div id="categories_div">
+    <div class="row">
+      <div class="col grid_item">
+        <a href="/matching" class="title_category_link"><h2 align="center" class="title_category">Become an Entrepreneur</h2></a>
+      </div>
+      <div class="col grid_item">
+        <a href="/fund_searcher" class="title_category_link"><h2 align="center" class="title_category">Find/Offer a Job</h2></a>
+      </div>
+      <div class="w-100"></div>
+      <div class="col grid_item">
+        <a href="/events" class="title_category_link"><h2 align="center" class="title_category">Learn/Teach</h2></a>
+      </div>
+      <div class="col grid_item">
+        <a href="/resources" class="title_category_link"><h2 align="center" class="title_category">Help/Get Help</h2></a>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -92,4 +109,4 @@ Mitsein
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
-{% endblock %}
+{% endblock %} 

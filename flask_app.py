@@ -9,6 +9,7 @@ import Crypto
 import Crypto.Random
 import binascii
 import blockchain_mitsein
+import re
 from collections import OrderedDict
 from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
@@ -73,6 +74,12 @@ class Users(UserMixin, db.Model):
     balance = db.Column(db.Integer)
     password = db.Column(db.String(80))
 
+class Posts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    amount = db.Column(db.String(50))
+    text = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime)
 
 class Orders_history_mitsein(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -126,6 +133,9 @@ class TransactionData(db.Model):
 """--------------------------------------------------------------------------------------------------------------------------------"""
 """-------------------------------------------------------SESSION------------------------------------------------------------------"""
 """--------------------------------------------------------------------------------------------------------------------------------"""
+
+class SearchForm(FlaskForm):
+    text = StringField('Search', validators=[InputRequired(), Length(max=100)])
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -218,9 +228,54 @@ def profile():
 def api_documentation():
     return render_template('API_documentation.html')
 
-@app.route('/social_coordination')
+def classify_post(post):
+    with open("web_crawling/classification_words.json", "r") as categories_file:
+        categories_dict = json.load(categories_file)
+        categories = categories_dict["categories"]
+        regex = re.compile('[^a-zA-Z]')
+        categories_list = []
+        for category in categories:
+            post = regex.sub(' ', post)
+            text_words = post.lower().split(" ")
+            if category.lower() in post:
+                categories_list.append(category)
+        return categories_list
+
+
+def filter_posts(posts, text):
+    regex = re.compile('[^a-zA-Z]')
+    text = regex.sub(' ', text)
+    print(text)
+    text_words = text.lower().split(" ")
+    display_list = []
+    for post in posts:
+        similarity_score = 0
+        for word_text in text:
+            if word_text in classify_post(post.text):
+                similarity_score +=1
+        if similarity_score >= 1:
+            display_list.append({"post":post.text, "score":similarity_score})
+    if len(display_list) >=1:
+        display_list = sorted(display_list, key=lambda k: k['score'], reverse=True)
+    return display_list
+
+
+@app.route('/social_coordination', methods=['POST', 'GET'])
 def social_coordination():
-    return render_template('social_coordination.html')
+    form = SearchForm()
+    if form.validate_on_submit():
+        posts = Posts.query.all()
+        text = form.text.data
+        filtered_posts = filter_posts(posts, text)
+        if len(filtered_posts)>=1:
+            return render_template('social_coordination.html', form=form, posts=filtered_posts)
+        else:
+            with open("web_crawling/classification_words.json", "r") as categories_file:
+                categories_dict = json.load(categories_file)
+                categories = categories_dict["categories"]
+                filtered_posts = google_search.obtain_matches(text, categories)
+            return render_template('social_coordination.html', form=form, posts=filtered_posts)
+    return render_template('social_coordination.html', form=form, posts= [{"post":"", "score": 0}])
 
 @app.route('/Blockchain')
 def blockchain():
